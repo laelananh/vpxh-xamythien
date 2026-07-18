@@ -67,7 +67,7 @@ app.get('/', (req, res) => {
 // 2. Giới Thiệu
 app.get('/gioi-thieu', (req, res) => {
   res.render('about', {
-    title: 'Giới Thiệu Văn Phòng Xã Hội Xã Mỹ Thiện'
+    title: 'Giới Thiệu Văn Phòng Văn hóa Xã hội Xã Mỹ Thiện'
   });
 });
 
@@ -380,7 +380,7 @@ app.use((req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`=======================================================`);
-  console.log(` CỔNG THÔNG TIN ĐIỆN TỬ VĂN PHÒNG XÃ HỘI XÃ MỸ THIỆN`);
+  console.log(` CỔNG THÔNG TIN ĐIỆN TỬ VĂN PHÒNG VĂN HOÁ XÃ HỘI XÃ MỸ THIỆN`);
   console.log(` Server running on http://localhost:${PORT}`);
   console.log(` Admin Portal: http://localhost:${PORT}/admin/login`);
   console.log(` Admin Credentials: admin / admin123`);

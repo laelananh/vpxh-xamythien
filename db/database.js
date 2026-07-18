@@ -188,7 +188,7 @@ let dbData = {
       id: 1,
       username: 'admin',
       password: bcrypt.hashSync('admin123', 10),
-      fullname: 'Quản trị viên Văn phòng Xã hội',
+      fullname: 'Quản trị viên Văn phòng Văn hóa Xã hội',
       email: 'admin@mythien.gov.vn',
       role: 'admin',
       created_at: '2026-07-01 08:00:00'
@@ -200,13 +200,13 @@ let dbData = {
   services: sampleServices,
   contacts: sampleContacts,
   settings: {
-    site_title: 'CỔNG THÔNG TIN ĐIỆN TỬ VĂN PHÒNG XÃ HỘI XÃ MỸ THIỆN',
-    sub_title: 'ỦY BAN NHÂN DÂN XÃ MỸ THIỆN - BỘ PHẬN MỘT CỬA & CHÍNH SÁCH XÃ HỘI',
+    site_title: 'CỔNG THÔNG TIN ĐIỆN TỬ VĂN PHÒNG VĂN HOÁ XÃ HỘI XÃ MỸ THIỆN',
+    sub_title: 'ỦY BAN NHÂN DÂN XÃ MỸ THIỆN - BỘ PHẬN MỘT CỬA & VĂN HOÁ XÃ HỘI',
     address: 'Trụ sở UBND Xã Mỹ Thiện, Ấp Mỹ Phú, Xã Mỹ Thiện, Huyện Cái Bè, Tỉnh Tiền Giang',
     phone: '0273 3855 123 - Hotline: 0918 456 789',
-    email: 'vanphongxahoi@mythien.tiengiang.gov.vn',
+    email: 'vanphongvanhoaxahoi@mythien.tiengiang.gov.vn',
     working_hours: 'Thứ 2 - Thứ 6: Sáng 07h30 - 11h30 | Chiều 13h30 - 17h00',
-    banner_announcement: 'Chào mừng Quý công dân đến với Cổng Dịch vụ công & Thông tin Văn phòng Xã hội Xã Mỹ Thiện.'
+    banner_announcement: 'Chào mừng Quý công dân đến với Cổng Dịch vụ công & Thông tin Văn phòng Văn hóa Xã hội Xã Mỹ Thiện.'
   }
 };
 
