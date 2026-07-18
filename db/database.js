@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs'); // wait, syntax fix
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const { createClient } = require('@supabase/supabase-js');
@@ -9,21 +9,231 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
 
 let supabase = null;
-if (supabaseUrl && supabaseKey) {
-  supabase = createClient(supabaseUrl, supabaseKey);
-  console.log('⚡ Connected to Supabase via API Token Key!');
+if (supabaseUrl && supabaseKey && supabaseUrl.startsWith('http')) {
+  try {
+    supabase = createClient(supabaseUrl, supabaseKey);
+    console.log('⚡ Connected to Supabase via API Token Key!');
+  } catch (e) {
+    console.error('Supabase connection error:', e);
+  }
 }
 
-// Local Memory Store & Fallback Data
+// Default Sample Seed Data
+const sampleCategories = [
+  { id: 'an-sinh', name: 'An sinh Xã hội & Trợ cấp', icon: 'fa-hands-holding-child' },
+  { id: 'nguoi-co-cong', name: 'Chăm sóc Người có công', icon: 'fa-medal' },
+  { id: 'bao-hiem-y-te', name: 'Bảo hiểm Y tế & Y tế', icon: 'fa-notes-medical' },
+  { id: 'tre-em-binh-dang', name: 'Bảo vệ Trẻ em & Gia đình', icon: 'fa-child-reaching' },
+  { id: 'lao-dong', name: 'Lao động & Việc làm', icon: 'fa-briefcase' }
+];
+
+const samplePosts = [
+  {
+    id: 1,
+    title: 'Xã Mỹ Thiện tổ chức thăm và trao quà cho các gia đình chính sách nhân ngày Thương binh - Liệt sĩ 27/7',
+    slug: 'xa-my-thien-to-chuc-tham-va-trao-qua-cho-cac-gia-dinh-chinh-sach-27-7',
+    category_id: 'nguoi-co-cong',
+    type: 'news',
+    summary: 'Sáng nay, đại diện UBND Xã Mỹ Thiện và Văn phòng Xã hội đã đến thăm hỏi, trao 45 phần quà ý nghĩa cho Thương bệnh binh, Thân nhân liệt sĩ và Mẹ Việt Nam Anh hùng trên địa bàn xã.',
+    content: `<p>Hướng tới kỷ niệm Ngày Thương binh - Liệt sĩ 27/7, Đảng ủy, Hội đồng nhân dân, Ủy ban nhân dân và Mặt trận Tổ quốc xã Mỹ Thiện đã thành lập các đoàn đến thăm hỏi, động viên và trao tặng các phần quà cho các gia đình chính sách, người có công với cách mạng.</p>
+    <p>Tại các nơi đến thăm, đại diện lãnh đạo xã Mỹ Thiện đã ân cần hỏi thăm sức khỏe, đời sống của các thương bệnh binh, gia đình liệt sĩ; đồng thời bày tỏ lòng biết ơn sâu sắc trước những cống hiến, sinh của các thế hệ cha anh đi trước vì sự nghiệp giải phóng dân tộc, thống nhất đất nước.</p>
+    <p>Mỗi phần quà trị giá 1.000.000 đồng cùng các nhu yếu phẩm đã được trao tận tay các hộ gia đình. Đại diện các gia đình chính sách cũng bày tỏ niềm xúc động và cảm ơn sự quan tâm chu đáo của chính quyền xã Mỹ Thiện.</p>`,
+    image_url: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=800&q=80',
+    is_featured: true,
+    views: 342,
+    created_at: '2026-07-15 09:30:00',
+    updated_at: '2026-07-15 09:30:00'
+  },
+  {
+    id: 2,
+    title: 'THÔNG BÁO: Lịch chi trả trợ cấp xã hội tháng 07/2026 tại Trụ sở UBND Xã Mỹ Thiện',
+    slug: 'thong-bao-lich-chi-tra-tro-cap-xa-hoi-thang-07-2026',
+    category_id: 'an-sinh',
+    type: 'announcement',
+    summary: 'Văn phòng Xã hội Xã Mỹ Thiện trân trọng thông báo lịch chi trả tiền trợ cấp bảo trợ xã hội và hỗ trợ người khuyết tật, người cao tuổi tháng 07/2026.',
+    content: `<p><strong>Văn phòng Xã hội Xã Mỹ Thiện xin thông báo đến toàn thể nhân dân và các đối tượng thụ hưởng chính sách bảo trợ xã hội về lịch chi trả như sau:</strong></p>
+    <ul>
+      <li><strong>Thời gian chi trả:</strong> Ngày 20/07/2026 và 21/07/2026 (Buổi sáng: 08h00 - 11h00 | Buổi chiều: 14h00 - 16h30).</li>
+      <li><strong>Địa điểm:</strong> Hội trường Bộ phận Một cửa - UBND Xã Mỹ Thiện.</li>
+      <li><strong>Giấy tờ mang theo:</strong> Căn cước công dân (CCCD) gắn chip bản gốc, Sổ nhận trợ cấp hoặc giấy ủy quyền hợp lệ.</li>
+    </ul>`,
+    image_url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
+    is_featured: true,
+    views: 520,
+    created_at: '2026-07-16 14:00:00',
+    updated_at: '2026-07-16 14:00:00'
+  },
+  {
+    id: 3,
+    title: 'Hướng dẫn làm thủ tục cấp thẻ Bảo hiểm Y tế miễn phí cho người cao tuổi từ 75 tuổi trở lên',
+    slug: 'huong-dan-lam-thu-tuc-cap-the-bhyt-mien-phi-cho-nguoi-cao-tuoi',
+    category_id: 'bao-hiem-y-te',
+    type: 'news',
+    summary: 'Theo quy định mới về chính sách bảo vệ sức khỏe người cao tuổi, tất cả công dân từ 75 tuổi trở lên thường trú tại xã Mỹ Thiện được ngân sách hỗ trợ 100% tiền đóng BHYT.',
+    content: `<p>Thực hiện chính sách an sinh xã hội nâng cao chăm sóc sức khỏe người cao tuổi, UBND Xã Mỹ Thiện phối hợp với Bảo hiểm Xã hội triển khai cấp thẻ BHYT miễn phí cho công dân từ 75 tuổi trở lên.</p>
+    <h3>Hồ sơ chuẩn bị:</h3>
+    <ol>
+      <li>Tờ khai tham gia BHYT (Mẫu TK1-TS) - Cung cấp miễn phí tại bộ phận Một cửa.</li>
+      <li>Bản sao Căn cước công dân.</li>
+    </ol>`,
+    image_url: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80',
+    is_featured: true,
+    views: 289,
+    created_at: '2026-07-10 10:15:00',
+    updated_at: '2026-07-10 10:15:00'
+  },
+  {
+    id: 4,
+    title: 'Tuyên truyền kỹ năng phòng chống đuối nước và bảo vệ an toàn cho trẻ em trong mùa hè 2026',
+    slug: 'tuyen-truyen-ky-nang-phong-chong-duoi-nuoc-tre-em-he-2026',
+    category_id: 'tre-em-binh-dang',
+    type: 'news',
+    summary: 'Nhằm đảm bảo an toàn tuyệt đối cho trẻ em trong dịp nghỉ hè, Văn phòng Xã hội phối hợp với Đoàn Thanh niên xã Mỹ Thiện tổ chức chuỗi hoạt động trang bị kỹ năng sống.',
+    content: `<p>Dịp hè là thời gian học sinh nghỉ học, nguy cơ xảy ra tai nạn thương tích, đặc biệt là tai nạn đuối nước tại các vùng sông nước sông rạch gia tăng.</p>`,
+    image_url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+    is_featured: false,
+    views: 198,
+    created_at: '2026-07-08 16:45:00',
+    updated_at: '2026-07-08 16:45:00'
+  },
+  {
+    id: 5,
+    title: 'Thông báo tiếp nhận đăng ký nhu cầu học nghề và giới thiệu việc làm đợt 2 năm 2026',
+    slug: 'thong-bao-tiep-nhan-dang-ky-hoc-nghe-viec-lam-dot-2-2026',
+    category_id: 'lao-dong',
+    type: 'announcement',
+    summary: 'Chương trình hỗ trợ đào tạo nghề ngắn hạn cho lao động nông thôn (May công nghiệp, Kỹ thuật điện dân dụng, Trồng cây ăn trái chất lượng cao) hoàn toàn miễn học phí.',
+    content: `<p>Văn phòng Xã hội Xã Mỹ Thiện thông báo tuyển sinh các lớp học nghề ngắn hạn dành cho người lao động có hộ khẩu thường trú tại địa phương.</p>`,
+    image_url: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=800&q=80',
+    is_featured: false,
+    views: 310,
+    created_at: '2026-07-05 08:30:00',
+    updated_at: '2026-07-05 08:30:00'
+  }
+];
+
+const sampleTenders = [
+  {
+    id: 1,
+    code: 'GT-MT-2026-01',
+    title: 'Gói thầu số 01: Mua sắm trang thiết bị âm thanh, ánh sáng và bàn ghế phục vụ Nhà văn hóa cộng đồng xã Mỹ Thiện',
+    budget: '350.000.000 VNĐ',
+    investor: 'Ủy ban nhân dân Xã Mỹ Thiện',
+    status: 'Đang mời thầu',
+    field: 'Mua sắm hàng hóa',
+    deadline: '2026-08-25 17:00:00',
+    published_at: '2026-07-12 09:00:00',
+    content: `Dự án trang bị cơ sở vật chất cho Nhà văn hóa cộng đồng Xã Mỹ Thiện.`
+  },
+  {
+    id: 2,
+    code: 'GT-MT-2026-02',
+    title: 'Gói thầu số 02: Nâng cấp, sửa chữa Hạng mục Sân chơi vận động và Dụng cụ thể thao ngoài trời cho trẻ em xã Mỹ Thiện',
+    budget: '480.000.000 VNĐ',
+    investor: 'Ủy ban nhân dân Xã Mỹ Thiện',
+    status: 'Đang mời thầu',
+    field: 'Xây lắp & Thiết bị',
+    deadline: '2026-08-10 16:30:00',
+    published_at: '2026-07-05 10:00:00',
+    content: `Thi công lắp đặt cụm thiết bị thể thao công cộng ngoài trời.`
+  }
+];
+
+const sampleServices = [
+  {
+    id: 1,
+    code: 'TTHC-XH-01',
+    title: 'Giải quyết trợ cấp xã hội hàng tháng đối với người cao tuổi, người khuyết tật và đối tượng bảo trợ xã hội',
+    category: 'Bảo trợ Xã hội',
+    level: 'Dịch vụ công Trực tuyến Toàn trình',
+    time_limit: '15 ngày làm việc',
+    fee: 'Miễn phí',
+    authority: 'Ủy ban nhân dân Xã Mỹ Thiện',
+    steps: ['Bước 1: Nộp hồ sơ', 'Bước 2: Thẩm định', 'Bước 3: Trả kết quả'],
+    dossier: ['Tờ khai Mẫu 01', 'Bản sao CCCD']
+  },
+  {
+    id: 2,
+    code: 'TTHC-XH-02',
+    title: 'Cấp thẻ Bảo hiểm Y tế miễn phí cho đối tượng bảo trợ xã hội, người thuộc hộ nghèo và cận nghèo',
+    category: 'Bảo hiểm Y tế',
+    level: 'Dịch vụ công Trực tuyến Một phần',
+    time_limit: '05 ngày làm việc',
+    fee: 'Miễn phí',
+    authority: 'UBND Xã Mỹ Thiện phối hợp BHXH Huyện',
+    steps: ['Bước 1: Nộp tờ khai TK1-TS', 'Bước 2: Cấp thẻ'],
+    dossier: ['Tờ khai TK1-TS', 'Giấy tờ chứng minh']
+  }
+];
+
+const sampleContacts = [
+  {
+    id: 1,
+    fullname: 'Nguyễn Văn An',
+    phone: '0912345678',
+    email: 'nguyenvanan@gmail.com',
+    address: 'Ấp Mỹ Phú, Xã Mỹ Thiện',
+    title: 'Hỏi về thời gian làm lại thẻ BHYT bị mất cho người cao tuổi',
+    content: 'Cho tôi hỏi cha tôi 80 tuổi bị mất thẻ BHYT, làm lại cấp lại mất bao lâu?',
+    status: 'Đã trả lời',
+    reply: 'Chào ông An, ông vui lòng mang CCCD của cụ đến Bộ phận Một cửa xã Mỹ Thiện.',
+    created_at: '2026-07-14 10:20:00'
+  }
+];
+
+// Local Data Object
 let dbData = {
-  users: [],
-  categories: [],
-  posts: [],
-  tenders: [],
-  services: [],
-  contacts: [],
-  settings: {}
+  users: [
+    {
+      id: 1,
+      username: 'admin',
+      password: bcrypt.hashSync('admin123', 10),
+      fullname: 'Quản trị viên Văn phòng Xã hội',
+      email: 'admin@mythien.gov.vn',
+      role: 'admin',
+      created_at: '2026-07-01 08:00:00'
+    }
+  ],
+  categories: sampleCategories,
+  posts: samplePosts,
+  tenders: sampleTenders,
+  services: sampleServices,
+  contacts: sampleContacts,
+  settings: {
+    site_title: 'CỔNG THÔNG TIN ĐIỆN TỬ VĂN PHÒNG XÃ HỘI XÃ MỸ THIỆN',
+    sub_title: 'ỦY BAN NHÂN DÂN XÃ MỸ THIỆN - BỘ PHẬN MỘT CỬA & CHÍNH SÁCH XÃ HỘI',
+    address: 'Trụ sở UBND Xã Mỹ Thiện, Ấp Mỹ Phú, Xã Mỹ Thiện, Huyện Cái Bè, Tỉnh Tiền Giang',
+    phone: '0273 3855 123 - Hotline: 0918 456 789',
+    email: 'vanphongxahoi@mythien.tiengiang.gov.vn',
+    working_hours: 'Thứ 2 - Thứ 6: Sáng 07h30 - 11h30 | Chiều 13h30 - 17h00',
+    banner_announcement: 'Chào mừng Quý công dân đến với Cổng Dịch vụ công & Thông tin Văn phòng Xã hội Xã Mỹ Thiện.'
+  }
 };
+
+// Auto Seed Supabase if connected
+async function autoSeedSupabase() {
+  if (!supabase) return;
+  try {
+    const { data: posts, error } = await supabase.from('posts').select('id').limit(1);
+    if (error && error.code === 'PGRST116') {
+      console.log('Tables not created in Supabase yet.');
+      return;
+    }
+    if (!posts || posts.length === 0) {
+      console.log('🌱 Seeding sample data to Supabase...');
+      await supabase.from('categories').upsert(sampleCategories);
+      await supabase.from('posts').upsert(samplePosts);
+      await supabase.from('tenders').upsert(sampleTenders);
+      await supabase.from('services').upsert(sampleServices);
+      await supabase.from('contacts').upsert(sampleContacts);
+      console.log('✅ Supabase Seed Completed Successfully!');
+    }
+  } catch (err) {
+    console.error('Supabase auto seed error:', err.message);
+  }
+}
+
+autoSeedSupabase();
 
 function saveLocal() {
   try {
@@ -38,129 +248,14 @@ function initLocal() {
     try {
       dbData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     } catch (e) {
-      seedDefaultLocalData();
+      saveLocal();
     }
   } else {
-    seedDefaultLocalData();
+    saveLocal();
   }
 }
 
-function seedDefaultLocalData() {
-  const salt = bcrypt.genSaltSync(10);
-  const hashedPassword = bcrypt.hashSync('admin123', salt);
-
-  dbData.users = [
-    {
-      id: 1,
-      username: 'admin',
-      password: hashedPassword,
-      fullname: 'Quản trị viên Văn phòng Xã hội',
-      email: 'admin@mythien.gov.vn',
-      role: 'admin',
-      created_at: '2026-07-01 08:00:00'
-    }
-  ];
-
-  dbData.categories = [
-    { id: 'an-sinh', name: 'An sinh Xã hội & Trợ cấp', icon: 'fa-hands-holding-child' },
-    { id: 'nguoi-co-cong', name: 'Chăm sóc Người có công', icon: 'fa-medal' },
-    { id: 'bao-hiem-y-te', name: 'Bảo hiểm Y tế & Y tế', icon: 'fa-notes-medical' },
-    { id: 'tre-em-binh-dang', name: 'Bảo vệ Trẻ em & Gia đình', icon: 'fa-child-reaching' },
-    { id: 'lao-dong', name: 'Lao động & Việc làm', icon: 'fa-briefcase' }
-  ];
-
-  dbData.settings = {
-    site_title: 'CỔNG THÔNG TIN ĐIỆN TỬ VĂN PHÒNG XÃ HỘI XÃ MỸ THIỆN',
-    sub_title: 'ỦY BAN NHÂN DÂN XÃ MỸ THIỆN - BỘ PHẬN MỘT CỬA & CHÍNH SÁCH XÃ HỘI',
-    address: 'Trụ sở UBND Xã Mỹ Thiện, Ấp Mỹ Phú, Xã Mỹ Thiện, Huyện Cái Bè, Tỉnh Tiền Giang',
-    phone: '0273 3855 123 - Hotline: 0918 456 789',
-    email: 'vanphongxahoi@mythien.tiengiang.gov.vn',
-    working_hours: 'Thứ 2 - Thứ 6: Sáng 07h30 - 11h30 | Chiều 13h30 - 17h00',
-    banner_announcement: 'Chào mừng Quý công dân đến với Cổng Dịch vụ công & Thông tin Văn phòng Xã hội Xã Mỹ Thiện.'
-  };
-
-  dbData.posts = [
-    {
-      id: 1,
-      title: 'Xã Mỹ Thiện tổ chức thăm và trao quà cho các gia đình chính sách nhân ngày Thương binh - Liệt sĩ 27/7',
-      slug: 'xa-my-thien-to-chuc-tham-va-trao-qua-cho-cac-gia-dinh-chinh-sach-27-7',
-      category_id: 'nguoi-co-cong',
-      type: 'news',
-      summary: 'Sáng nay, đại diện UBND Xã Mỹ Thiện và Văn phòng Xã hội đã đến thăm hỏi, trao 45 phần quà ý nghĩa cho Thương bệnh binh, Thân nhân liệt sĩ và Mẹ Việt Nam Anh hùng trên địa bàn xã.',
-      content: `<p>Hướng tới kỷ niệm Ngày Thương binh - Liệt sĩ 27/7, Đảng ủy, Hội đồng nhân dân, Ủy ban nhân dân và Mặt trận Tổ quốc xã Mỹ Thiện đã thành lập các đoàn đến thăm hỏi, động viên và trao tặng các phần quà cho các gia đình chính sách, người có công với cách mạng.</p>`,
-      image_url: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=800&q=80',
-      is_featured: true,
-      views: 342,
-      created_at: '2026-07-15 09:30:00',
-      updated_at: '2026-07-15 09:30:00'
-    },
-    {
-      id: 2,
-      title: 'THÔNG BÁO: Lịch chi trả trợ cấp xã hội tháng 07/2026 tại Trụ sở UBND Xã Mỹ Thiện',
-      slug: 'thong-bao-lich-chi-tra-tro-cap-xa-hoi-thang-07-2026',
-      category_id: 'an-sinh',
-      type: 'announcement',
-      summary: 'Văn phòng Xã hội Xã Mỹ Thiện trân trọng thông báo lịch chi trả tiền trợ cấp bảo trợ xã hội và hỗ trợ người khuyết tật, người cao tuổi tháng 07/2026.',
-      content: `<p><strong>Văn phòng Xã hội Xã Mỹ Thiện xin thông báo đến toàn thể nhân dân và các đối tượng thụ hưởng chính sách bảo trợ xã hội về lịch chi trả như sau:</strong></p>`,
-      image_url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
-      is_featured: true,
-      views: 520,
-      created_at: '2026-07-16 14:00:00',
-      updated_at: '2026-07-16 14:00:00'
-    }
-  ];
-
-  dbData.tenders = [
-    {
-      id: 1,
-      code: 'GT-MT-2026-01',
-      title: 'Gói thầu số 01: Mua sắm trang thiết bị âm thanh, ánh sáng và bàn ghế phục vụ Nhà văn hóa cộng đồng xã Mỹ Thiện',
-      budget: '350.000.000 VNĐ',
-      investor: 'Ủy ban nhân dân Xã Mỹ Thiện',
-      status: 'Đang mời thầu',
-      field: 'Mua sắm hàng hóa',
-      deadline: '2026-08-25 17:00:00',
-      published_at: '2026-07-12 09:00:00',
-      content: `Dự án trang bị cơ sở vật chất cho Nhà văn hóa cộng đồng Xã Mỹ Thiện.`
-    }
-  ];
-
-  dbData.services = [
-    {
-      id: 1,
-      code: 'TTHC-XH-01',
-      title: 'Giải quyết trợ cấp xã hội hàng tháng đối với người cao tuổi, người khuyết tật và đối tượng bảo trợ xã hội',
-      category: 'Bảo trợ Xã hội',
-      level: 'Dịch vụ công Trực tuyến Toàn trình',
-      time_limit: '15 ngày làm việc',
-      fee: 'Miễn phí',
-      authority: 'Ủy ban nhân dân Xã Mỹ Thiện',
-      steps: ['Bước 1: Nộp hồ sơ', 'Bước 2: Thẩm định', 'Bước 3: Trả kết quả'],
-      dossier: ['Tờ khai Mẫu 01', 'Bản sao CCCD']
-    }
-  ];
-
-  dbData.contacts = [
-    {
-      id: 1,
-      fullname: 'Nguyễn Văn An',
-      phone: '0912345678',
-      email: 'nguyenvanan@gmail.com',
-      address: 'Ấp Mỹ Phú, Xã Mỹ Thiện',
-      title: 'Hỏi về thời gian làm lại thẻ BHYT bị mất cho người cao tuổi',
-      content: 'Cho tôi hỏi cha tôi 80 tuổi bị mất thẻ BHYT, làm lại cấp lại mất bao lâu?',
-      status: 'Đã trả lời',
-      reply: 'Chào ông An, ông vui lòng mang CCCD của cụ đến Bộ phận Một cửa xã Mỹ Thiện.',
-      created_at: '2026-07-14 10:20:00'
-    }
-  ];
-
-  saveLocal();
-}
-
-if (!supabase) {
-  initLocal();
-}
+initLocal();
 
 module.exports = {
   supabase: supabase,
@@ -206,6 +301,14 @@ module.exports = {
     };
     dbData.posts.unshift(newPost);
     saveLocal();
+
+    // Async push to Supabase if connected
+    if (supabase) {
+      supabase.from('posts').insert([newPost]).then(({ error }) => {
+        if (error) console.error('Error inserting post to Supabase:', error.message);
+      });
+    }
+
     return newPost;
   },
   updatePost: (id, postData) => {
@@ -220,6 +323,11 @@ module.exports = {
         updated_at: now
       };
       saveLocal();
+
+      if (supabase) {
+        supabase.from('posts').update(dbData.posts[idx]).eq('id', parseInt(id)).then();
+      }
+
       return dbData.posts[idx];
     }
     return null;
@@ -229,6 +337,11 @@ module.exports = {
     if (idx !== -1) {
       dbData.posts.splice(idx, 1);
       saveLocal();
+
+      if (supabase) {
+        supabase.from('posts').delete().eq('id', parseInt(id)).then();
+      }
+
       return true;
     }
     return false;
@@ -238,6 +351,10 @@ module.exports = {
     if (post) {
       post.views = (post.views || 0) + 1;
       saveLocal();
+
+      if (supabase) {
+        supabase.from('posts').update({ views: post.views }).eq('id', parseInt(id)).then();
+      }
     }
   },
 
@@ -268,6 +385,11 @@ module.exports = {
     };
     dbData.tenders.unshift(newTender);
     saveLocal();
+
+    if (supabase) {
+      supabase.from('tenders').insert([newTender]).then();
+    }
+
     return newTender;
   },
   deleteTender: (id) => {
@@ -275,6 +397,11 @@ module.exports = {
     if (idx !== -1) {
       dbData.tenders.splice(idx, 1);
       saveLocal();
+
+      if (supabase) {
+        supabase.from('tenders').delete().eq('id', parseInt(id)).then();
+      }
+
       return true;
     }
     return false;
@@ -307,6 +434,11 @@ module.exports = {
     };
     dbData.services.push(newService);
     saveLocal();
+
+    if (supabase) {
+      supabase.from('services').insert([newService]).then();
+    }
+
     return newService;
   },
   deleteService: (id) => {
@@ -314,6 +446,11 @@ module.exports = {
     if (idx !== -1) {
       dbData.services.splice(idx, 1);
       saveLocal();
+
+      if (supabase) {
+        supabase.from('services').delete().eq('id', parseInt(id)).then();
+      }
+
       return true;
     }
     return false;
@@ -338,6 +475,11 @@ module.exports = {
     };
     dbData.contacts.unshift(newContact);
     saveLocal();
+
+    if (supabase) {
+      supabase.from('contacts').insert([newContact]).then();
+    }
+
     return newContact;
   },
   replyContact: (id, replyText) => {
@@ -346,6 +488,11 @@ module.exports = {
       contact.reply = replyText;
       contact.status = 'Đã trả lời';
       saveLocal();
+
+      if (supabase) {
+        supabase.from('contacts').update({ reply: replyText, status: 'Đã trả lời' }).eq('id', parseInt(id)).then();
+      }
+
       return contact;
     }
     return null;
