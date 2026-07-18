@@ -30,14 +30,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB
+  limits: { fileSize: 25 * 1024 * 1024 } // 25MB to accommodate document PDFs
 });
+
+const postUpload = upload.fields([
+  { name: 'image_file', maxCount: 1 },
+  { name: 'pdf_file', maxCount: 1 }
+]);
 
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -171,7 +174,6 @@ app.get('/dich-vu-cong/tra-cuu', (req, res) => {
   let result = null;
 
   if (code) {
-    // Demo Dossier Lookup logic
     result = {
       code: code,
       applicant: 'Nguyễn Văn ' + (code.length > 3 ? 'A' : 'B'),
@@ -303,16 +305,25 @@ app.get('/admin/posts/create', requireAuth, (req, res) => {
 });
 
 // Post Management - Create Action
-app.post('/admin/posts/create', requireAuth, upload.single('image_file'), (req, res) => {
+app.post('/admin/posts/create', requireAuth, postUpload, (req, res) => {
   const { title, category_id, type, summary, content, is_featured } = req.body;
   let image_url = req.body.image_url;
+  let pdf_url = req.body.pdf_url;
+  let pdf_name = req.body.pdf_name || '';
 
-  if (req.file) {
-    image_url = '/uploads/' + req.file.filename;
+  if (req.files && req.files['image_file'] && req.files['image_file'][0]) {
+    image_url = '/uploads/' + req.files['image_file'][0].filename;
+  }
+
+  if (req.files && req.files['pdf_file'] && req.files['pdf_file'][0]) {
+    pdf_url = '/uploads/' + req.files['pdf_file'][0].filename;
+    if (!pdf_name) {
+      pdf_name = req.files['pdf_file'][0].originalname;
+    }
   }
 
   if (title && content) {
-    const newPost = db.createPost({ title, category_id, type, summary, content, image_url, is_featured });
+    const newPost = db.createPost({ title, category_id, type, summary, content, image_url, pdf_url, pdf_name, is_featured });
     return res.redirect(`/admin/posts?msg=created`);
   }
   res.redirect('/admin/posts/create?error=missing');
@@ -330,15 +341,24 @@ app.get('/admin/posts/edit/:id', requireAuth, (req, res) => {
 });
 
 // Post Management - Edit Action
-app.post('/admin/posts/edit/:id', requireAuth, upload.single('image_file'), (req, res) => {
+app.post('/admin/posts/edit/:id', requireAuth, postUpload, (req, res) => {
   const { title, category_id, type, summary, content, is_featured } = req.body;
   let image_url = req.body.image_url;
+  let pdf_url = req.body.pdf_url;
+  let pdf_name = req.body.pdf_name || '';
 
-  if (req.file) {
-    image_url = '/uploads/' + req.file.filename;
+  if (req.files && req.files['image_file'] && req.files['image_file'][0]) {
+    image_url = '/uploads/' + req.files['image_file'][0].filename;
   }
 
-  db.updatePost(req.params.id, { title, category_id, type, summary, content, image_url, is_featured });
+  if (req.files && req.files['pdf_file'] && req.files['pdf_file'][0]) {
+    pdf_url = '/uploads/' + req.files['pdf_file'][0].filename;
+    if (!pdf_name) {
+      pdf_name = req.files['pdf_file'][0].originalname;
+    }
+  }
+
+  db.updatePost(req.params.id, { title, category_id, type, summary, content, image_url, pdf_url, pdf_name, is_featured });
   res.redirect('/admin/posts?msg=updated');
 });
 
@@ -346,6 +366,21 @@ app.post('/admin/posts/edit/:id', requireAuth, upload.single('image_file'), (req
 app.post('/admin/posts/delete/:id', requireAuth, (req, res) => {
   db.deletePost(req.params.id);
   res.redirect('/admin/posts?msg=deleted');
+});
+
+// Quick Upload API for PDF & Images (AJAX endpoint)
+app.post('/admin/upload-api', requireAuth, upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'Chưa chọn file' });
+  }
+  const fileUrl = '/uploads/' + req.file.filename;
+  res.json({
+    success: true,
+    url: fileUrl,
+    filename: req.file.filename,
+    originalname: req.file.originalname,
+    mimetype: req.file.mimetype
+  });
 });
 
 // Tender Management - List & Create View

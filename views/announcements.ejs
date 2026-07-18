@@ -10,7 +10,7 @@
 
     <div class="gov-card">
       <div class="card-header-gov">
-        <h3><i class="fa-solid fa-bullhorn"></i> THÔNG BÁO CHÍNH THỨC PHÒNG VĂN HOÁ XÃ HỘI XÃ MỸ THIỆN</h3>
+        <h3><i class="fa-solid fa-bullhorn"></i> THÔNG BÁO CHÍNH THỨC <%= settings.site_title %></h3>
       </div>
       <div class="card-body-gov">
         
@@ -35,6 +35,11 @@
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 10px; flex-wrap: wrap;">
                   <h3 style="font-size: 1.15rem; color: var(--gov-navy); line-height: 1.4;">
                     <a href="/tin-tuc/<%= item.slug %>"><%= item.title %></a>
+                    <% if (item.pdf_url) { %>
+                      <span style="background: #dc3545; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-left: 8px; vertical-align: middle; display: inline-block;">
+                        <i class="fa-solid fa-file-pdf"></i> Có File PDF Hồ sơ
+                      </span>
+                    <% } %>
                   </h3>
                   <span class="badge-gov badge-red">
                     <i class="fa-regular fa-clock"></i> <%= item.created_at %>
@@ -45,11 +50,18 @@
                   <%= item.summary %>
                 </p>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--gov-border); padding-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--gov-border); padding-top: 10px; flex-wrap: wrap; gap: 10px;">
                   <small style="color: var(--gov-text-muted);"><i class="fa-regular fa-eye"></i> <%= item.views %> lượt xem</small>
-                  <a href="/tin-tuc/<%= item.slug %>" class="btn-gov btn-gov-sm btn-gov-primary">
-                    Xem chi tiết thông báo <i class="fa-solid fa-arrow-right"></i>
-                  </a>
+                  <div style="display: flex; gap: 10px;">
+                    <% if (item.pdf_url) { %>
+                      <a href="<%= item.pdf_url %>" download class="btn-gov btn-gov-sm btn-gov-red" style="padding: 4px 12px; font-size: 0.82rem;">
+                        <i class="fa-solid fa-download"></i> Tải hồ sơ PDF
+                      </a>
+                    <% } %>
+                    <a href="/tin-tuc/<%= item.slug %>" class="btn-gov btn-gov-sm btn-gov-primary" style="padding: 4px 12px; font-size: 0.82rem;">
+                      Xem chi tiết thông báo <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                  </div>
                 </div>
               </div>
             <% }); %>

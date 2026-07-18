@@ -294,6 +294,8 @@ module.exports = {
       summary: postData.summary || '',
       content: postData.content || '',
       image_url: postData.image_url || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=800&q=80',
+      pdf_url: postData.pdf_url || '',
+      pdf_name: postData.pdf_name || '',
       is_featured: postData.is_featured === true || postData.is_featured === 'true' || postData.is_featured === 'on',
       views: 0,
       created_at: now,
