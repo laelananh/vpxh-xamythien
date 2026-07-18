@@ -2,11 +2,36 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
+const multer = require('multer');
 const db = require('./db/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Ensure public/uploads directory exists
+const uploadDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer Storage Configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB
+});
 
 // View engine setup
 app.set('view engine', 'ejs');
@@ -278,8 +303,14 @@ app.get('/admin/posts/create', requireAuth, (req, res) => {
 });
 
 // Post Management - Create Action
-app.post('/admin/posts/create', requireAuth, (req, res) => {
-  const { title, category_id, type, summary, content, image_url, is_featured } = req.body;
+app.post('/admin/posts/create', requireAuth, upload.single('image_file'), (req, res) => {
+  const { title, category_id, type, summary, content, is_featured } = req.body;
+  let image_url = req.body.image_url;
+
+  if (req.file) {
+    image_url = '/uploads/' + req.file.filename;
+  }
+
   if (title && content) {
     const newPost = db.createPost({ title, category_id, type, summary, content, image_url, is_featured });
     return res.redirect(`/admin/posts?msg=created`);
@@ -299,8 +330,14 @@ app.get('/admin/posts/edit/:id', requireAuth, (req, res) => {
 });
 
 // Post Management - Edit Action
-app.post('/admin/posts/edit/:id', requireAuth, (req, res) => {
-  const { title, category_id, type, summary, content, image_url, is_featured } = req.body;
+app.post('/admin/posts/edit/:id', requireAuth, upload.single('image_file'), (req, res) => {
+  const { title, category_id, type, summary, content, is_featured } = req.body;
+  let image_url = req.body.image_url;
+
+  if (req.file) {
+    image_url = '/uploads/' + req.file.filename;
+  }
+
   db.updatePost(req.params.id, { title, category_id, type, summary, content, image_url, is_featured });
   res.redirect('/admin/posts?msg=updated');
 });

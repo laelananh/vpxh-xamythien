@@ -32,7 +32,7 @@
 
         <div style="background: white; border: 1px solid var(--gov-border); border-radius: 6px; padding: 25px; box-shadow: var(--gov-shadow);">
           
-          <form action="<%= post ? '/admin/posts/edit/' + post.id : '/admin/posts/create' %>" method="POST">
+          <form action="<%= post ? '/admin/posts/edit/' + post.id : '/admin/posts/create' %>" method="POST" enctype="multipart/form-data">
             
             <div class="form-group">
               <label>Tiêu đề bài viết / thông báo <span style="color: var(--gov-red);">*</span></label>
@@ -67,10 +67,57 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label>Đường dẫn hình ảnh đại diện (Image URL)</label>
-              <input type="text" name="image_url" value="<%= post ? post.image_url : '' %>" class="form-control" placeholder="https://images.unsplash.com/...">
+            <!-- Hình ảnh đại diện: Tải từ máy tính HOẶC nhập Link URL -->
+            <div class="form-group" style="background: #f8f9fa; padding: 18px; border-radius: 6px; border: 1px dashed var(--gov-border); margin-bottom: 20px;">
+              <label style="font-weight: bold; color: var(--gov-navy); margin-bottom: 10px; display: block;">
+                <i class="fa-solid fa-image"></i> Hình ảnh đại diện bài viết
+              </label>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
+                <!-- Option 1: Upload file từ máy tính -->
+                <div>
+                  <label style="font-size: 0.88rem; color: #555;"><i class="fa-solid fa-desktop"></i> 1. Tải ảnh trực tiếp từ máy tính (Khuyên dùng):</label>
+                  <input type="file" name="image_file" accept="image/*" class="form-control" id="image_file_input" style="padding: 8px; background: white;" onchange="handleFileSelect(this)">
+                  <small style="color: #666; font-size: 0.78rem; margin-top: 4px; display: block;">Hỗ trợ định dạng: JPG, PNG, WEBP, GIF (Dung lượng tối đa 10MB).</small>
+                </div>
+
+                <!-- Option 2: Nhập URL ảnh online -->
+                <div>
+                  <label style="font-size: 0.88rem; color: #555;"><i class="fa-solid fa-link"></i> 2. Hoặc dán đường dẫn URL ảnh trực tuyến (Image URL):</label>
+                  <input type="text" name="image_url" id="image_url_input" value="<%= post ? post.image_url : '' %>" class="form-control" placeholder="https://..." oninput="handleUrlInput(this)">
+                </div>
+              </div>
+
+              <!-- Preview khung xem trước hình ảnh -->
+              <div id="image_preview_box" style="margin-top: 15px; display: <%= post && post.image_url ? 'block' : 'none' %>; text-align: center; background: white; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
+                <small style="display: block; color: #777; margin-bottom: 5px; font-weight: bold;">Xem trước hình ảnh đại diện:</small>
+                <img id="image_preview_img" src="<%= post ? post.image_url : '' %>" alt="Preview" style="max-height: 180px; max-width: 100%; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+              </div>
             </div>
+
+            <script>
+              function handleFileSelect(input) {
+                if (input.files && input.files[0]) {
+                  var reader = new FileReader();
+                  reader.onload = function(e) {
+                    document.getElementById('image_preview_img').src = e.target.result;
+                    document.getElementById('image_preview_box').style.display = 'block';
+                  }
+                  reader.readAsDataURL(input.files[0]);
+                }
+              }
+
+              function handleUrlInput(input) {
+                if (input.value.trim() !== '') {
+                  document.getElementById('image_preview_img').src = input.value.trim();
+                  document.getElementById('image_preview_box').style.display = 'block';
+                } else {
+                  if (!document.getElementById('image_file_input').files.length) {
+                    document.getElementById('image_preview_box').style.display = 'none';
+                  }
+                }
+              }
+            </script>
 
             <div class="form-group">
               <label>Tóm tắt bài viết (Mô tả ngắn hiển thị ở danh sách)</label>
