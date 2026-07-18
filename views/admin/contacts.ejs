@@ -1,0 +1,82 @@
+<%- include('../partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <div class="admin-wrapper">
+      
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <ul class="admin-menu">
+          <li><a href="/admin"><i class="fa-solid fa-gauge"></i> Tổng quan Báo cáo</a></li>
+          <li><a href="/admin/posts"><i class="fa-solid fa-newspaper"></i> Quản lý Bài viết & Tin</a></li>
+          <li><a href="/admin/tenders"><i class="fa-solid fa-file-contract"></i> Quản lý Gói Thầu</a></li>
+          <li><a href="/admin/services"><i class="fa-solid fa-hands-holding-child"></i> Quản lý Dịch vụ công</a></li>
+          <li class="active"><a href="/admin/contacts"><i class="fa-solid fa-comments"></i> Ý kiến Phản ánh</a></li>
+          <li style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);"><a href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Cổng Công Khai</a></li>
+          <li><a href="/admin/logout" style="color: #ff9999;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+        </ul>
+      </aside>
+
+      <!-- Admin Content -->
+      <section class="admin-content">
+        
+        <h2 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--gov-navy); margin-bottom: 20px;">
+          TIẾP NHẬN & XỬ LÝ PHẢN ÁNH KIẾN NGHỊ NHÂN DÂN
+        </h2>
+
+        <% if (contacts.length === 0) { %>
+          <div style="background: white; border: 1px solid var(--gov-border); padding: 40px; text-align: center; color: var(--gov-text-muted); border-radius: 6px;">
+            <i class="fa-regular fa-comments" style="font-size: 48px; margin-bottom: 10px;"></i>
+            <p>Chưa có ý kiến phản ánh nào từ công dân.</p>
+          </div>
+        <% } else { %>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <% contacts.forEach(c => { %>
+              <div style="background: white; border: 1px solid var(--gov-border); border-left: 5px solid <%= c.status === 'Đã trả lời' ? '#27ae60' : 'var(--gov-red)' %>; border-radius: 6px; padding: 20px; box-shadow: var(--gov-shadow);">
+                
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                  <div>
+                    <h3 style="color: var(--gov-navy); font-size: 1.1rem;"><%= c.title %></h3>
+                    <small style="color: var(--gov-text-muted);">
+                      Công dân: <strong><%= c.fullname %></strong> | ĐT: <%= c.phone %> | Địa chỉ: <%= c.address || 'Xã Mỹ Thiện' %>
+                    </small>
+                  </div>
+                  <span class="badge-gov <%= c.status === 'Đã trả lời' ? 'badge-green' : 'badge-red' %>">
+                    <%= c.status %>
+                  </span>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; font-size: 0.95rem; margin-bottom: 15px; border-left: 3px solid #ccc;">
+                  <strong>Nội dung phản ánh:</strong><br><%= c.content %>
+                </div>
+
+                <% if (c.reply) { %>
+                  <div style="background: #eef2f5; padding: 15px; border-radius: 4px; font-size: 0.95rem; margin-bottom: 15px; border-left: 3px solid #27ae60;">
+                    <strong style="color: #27ae60;"><i class="fa-solid fa-reply"></i> Nội dung trả lời của Cán bộ VPXH:</strong><br><%= c.reply %>
+                  </div>
+                <% } %>
+
+                <!-- Reply Form -->
+                <form action="/admin/contacts/reply/<%= c.id %>" method="POST" style="margin-top: 15px; border-top: 1px dashed var(--gov-border); padding-top: 15px;">
+                  <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="font-size: 0.85rem;"><%= c.reply ? 'Cập nhật nội dung trả lời:' : 'Soạn câu trả lời phản hồi công dân:' %></label>
+                    <textarea name="reply" class="form-control" rows="2" placeholder="Nhập nội dung trả lời rõ ràng..." required><%= c.reply %></textarea>
+                  </div>
+                  <button type="submit" class="btn-gov btn-gov-sm btn-gov-primary">
+                    <i class="fa-solid fa-paper-plane"></i> <%= c.reply ? 'Cập nhật câu trả lời' : 'Gửi câu trả lời cho công dân' %>
+                  </button>
+                </form>
+
+              </div>
+            <% }); %>
+          </div>
+        <% } %>
+
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

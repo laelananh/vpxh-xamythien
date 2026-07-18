@@ -1,0 +1,76 @@
+<%- include('partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--gov-text-muted);">
+      <a href="/"><i class="fa-solid fa-house"></i> Trang chủ</a> / 
+      <a href="/dich-vu-cong">Dịch Vụ Công</a> / 
+      <strong style="color: var(--gov-navy);"><%= service.code %></strong>
+    </div>
+
+    <div class="gov-card">
+      <div class="card-header-gov">
+        <h3><i class="fa-solid fa-file-shield"></i> CHI TIẾT THỦ TỤC HÀNH CHÍNH</h3>
+      </div>
+      <div class="card-body-gov" style="line-height: 1.7;">
+        
+        <div style="margin-bottom: 20px; border-bottom: 2px solid var(--gov-border); padding-bottom: 15px;">
+          <span class="badge-gov badge-blue" style="font-size: 0.85rem;"><%= service.code %></span>
+          <span class="badge-gov badge-green" style="font-size: 0.85rem;"><%= service.level %></span>
+          <h1 style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--gov-navy); margin-top: 8px; line-height: 1.35;">
+            <%= service.title %>
+          </h1>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 25px; border-left: 4px solid var(--gov-navy);">
+          <div><strong>Cơ quan thực hiện:</strong> <br><%= service.authority %></div>
+          <div><strong>Thời hạn giải quyết:</strong> <br><span style="color: var(--gov-red); font-weight: bold;"><%= service.time_limit %></span></div>
+          <div><strong>Lệ phí:</strong> <br><span style="color: var(--gov-navy); font-weight: bold;"><%= service.fee %></span></div>
+          <div><strong>Lĩnh vực:</strong> <br><%= service.category %></div>
+        </div>
+
+        <h3 style="color: var(--gov-navy); font-size: 1.15rem; margin-bottom: 12px; border-bottom: 2px solid var(--gov-gold); padding-bottom: 5px;">
+          <i class="fa-solid fa-list-ol" style="color: var(--gov-red);"></i> TRÌNH TỰ CÁC BƯỚC THỰC HIỆN
+        </h3>
+        <ul style="list-style: none; margin-bottom: 30px;">
+          <% service.steps.forEach((step, idx) => { %>
+            <li style="background: #fff; border: 1px solid var(--gov-border); padding: 12px 16px; border-radius: 4px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+              <%= step %>
+            </li>
+          <% }); %>
+        </ul>
+
+        <h3 style="color: var(--gov-navy); font-size: 1.15rem; margin-bottom: 12px; border-bottom: 2px solid var(--gov-gold); padding-bottom: 5px;">
+          <i class="fa-solid fa-folder-open" style="color: var(--gov-red);"></i> THÀNH PHẦN HỒ SƠ CẦN NỘP
+        </h3>
+        <ul style="margin-left: 20px; margin-bottom: 30px;">
+          <% service.dossier.forEach(doc => { %>
+            <li style="margin-bottom: 8px; font-weight: 500;">
+              <%= doc %>
+            </li>
+          <% }); %>
+        </ul>
+
+        <div style="background: #eef2f5; padding: 20px; border-radius: 6px; border: 1px solid var(--gov-border); text-align: center;">
+          <h4 style="color: var(--gov-navy); margin-bottom: 10px;">Bạn đã chuẩn bị xong thành phần hồ sơ?</h4>
+          <p style="font-size: 0.9rem; color: var(--gov-text-muted); margin-bottom: 15px;">Tải mẫu đơn điền sẵn hoặc bấm nút nộp hồ sơ trực tuyến để được hướng dẫn cán bộ tiếp nhận.</p>
+          
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <a href="javascript:void(0)" onclick="alert('Đang tải Biểu mẫu đăng ký <%= service.code %> (File DOC)...')" class="btn-gov btn-gov-primary">
+              <i class="fa-solid fa-file-word"></i> Tải Biểu Mẫu Đăng Ký (DOC)
+            </a>
+            <a href="javascript:void(0)" onclick="alert('Tính năng Nộp hồ sơ trực tuyến đang kết nối Cổng Dịch vụ công Tiền Giang. Vui lòng nộp trực tiếp tại Bộ phận Một cửa xã Mỹ Thiện.')" class="btn-gov btn-gov-red">
+              <i class="fa-solid fa-paper-plane"></i> Nộp Hồ Sơ Trực Tuyến
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>

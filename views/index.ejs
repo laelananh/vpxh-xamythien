@@ -1,0 +1,227 @@
+<%- include('partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <!-- Quick Access Dịch Vụ Công Buttons -->
+    <div class="service-quick-grid">
+      <a href="/dich-vu-cong?cat=B%E1%BA%A3o+tr%E1%BB%A3+X%C3%A3+h%E1%BB%99i" class="quick-btn">
+        <div class="quick-icon"><i class="fa-solid fa-hands-holding-circle"></i></div>
+        <div class="quick-text">
+          <h4>Trợ Cấp Xã Hội</h4>
+          <p>Người cao tuổi, khuyết tật</p>
+        </div>
+      </a>
+      
+      <a href="/dich-vu-cong?cat=B%E1%BA%A3o+hi%E1%BB%83m+Y+t%E1%BA%BF" class="quick-btn">
+        <div class="quick-icon"><i class="fa-solid fa-notes-medical"></i></div>
+        <div class="quick-text">
+          <h4>Bảo Hiểm Y Tế</h4>
+          <p>Cấp mới & gia hạn BHYT</p>
+        </div>
+      </a>
+
+      <a href="/goi-thau" class="quick-btn">
+        <div class="quick-icon"><i class="fa-solid fa-file-contract"></i></div>
+        <div class="quick-text">
+          <h4>Gói Thầu Mua Sắm</h4>
+          <p>Mời thầu an sinh công</p>
+        </div>
+      </a>
+
+      <a href="/dich-vu-cong/tra-cuu" class="quick-btn">
+        <div class="quick-icon"><i class="fa-solid fa-file-shield"></i></div>
+        <div class="quick-text">
+          <h4>Tra Cứu Hồ Sơ</h4>
+          <p>Theo dõi tiến độ xử lý</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Featured Hero News Grid -->
+    <% if (featuredPosts.length > 0) { %>
+      <div class="featured-hero">
+        <!-- Main Highlight Post -->
+        <div class="hero-main">
+          <img src="<%= featuredPosts[0].image_url %>" alt="<%= featuredPosts[0].title %>">
+          <div class="hero-overlay">
+            <div class="meta-date"><i class="fa-regular fa-calendar"></i> <%= featuredPosts[0].created_at %></div>
+            <h2><a href="/tin-tuc/<%= featuredPosts[0].slug %>"><%= featuredPosts[0].title %></a></h2>
+            <p style="font-size: 0.9rem; color: #e0e0e0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+              <%= featuredPosts[0].summary %>
+            </p>
+          </div>
+        </div>
+
+        <!-- Sub Highlight Posts -->
+        <div class="hero-sub-list">
+          <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--gov-navy); text-transform: uppercase; border-bottom: 2px solid var(--gov-red); padding-bottom: 5px; margin-bottom: 10px;">
+            <i class="fa-solid fa-fire" style="color: var(--gov-red);"></i> Tin Nổi Bật
+          </h3>
+          <% featuredPosts.slice(1, 4).forEach(post => { %>
+            <div class="sub-news-item">
+              <img src="<%= post.image_url %>" alt="<%= post.title %>">
+              <div class="sub-news-info">
+                <div class="meta-date" style="color: var(--gov-text-muted);"><i class="fa-regular fa-clock"></i> <%= post.created_at.substring(0, 10) %></div>
+                <h4><a href="/tin-tuc/<%= post.slug %>"><%= post.title %></a></h4>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Performance Counter Stats -->
+    <div class="stats-banner">
+      <div class="stat-item">
+        <div class="number">1.250+</div>
+        <div class="label">Hồ sơ đã giải quyết</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">99.4%</div>
+        <div class="label">Tỷ lệ đúng hạn & sớm hạn</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">100%</div>
+        <div class="label">Hài lòng của người dân</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">12</div>
+        <div class="label">Thủ tục DVC toàn trình</div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="layout-grid">
+      <!-- Left Main Column: Tin Tức & Gói Thầu -->
+      <div class="main-column">
+        
+        <!-- Latest News Section -->
+        <div class="gov-card">
+          <div class="card-header-gov">
+            <h3><i class="fa-solid fa-newspaper"></i> Tin Tức - Sự Kiện Mới Nhất</h3>
+            <a href="/tin-tuc" style="color: var(--gov-gold-light); font-size: 0.85rem;"><i class="fa-solid fa-angles-right"></i> Xem tất cả</a>
+          </div>
+          <div class="card-body-gov">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px;">
+              <% latestNews.forEach(post => { %>
+                <div style="background: #fff; border: 1px solid var(--gov-border); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column;">
+                  <img src="<%= post.image_url %>" alt="<%= post.title %>" style="width: 100%; height: 140px; object-fit: cover;">
+                  <div style="padding: 12px; flex-grow: 1; display: flex; flex-direction: column;">
+                    <div style="font-size: 0.75rem; color: var(--gov-text-muted); margin-bottom: 5px;">
+                      <i class="fa-regular fa-calendar"></i> <%= post.created_at.substring(0, 10) %> | <i class="fa-regular fa-eye"></i> <%= post.views %> lượt xem
+                    </div>
+                    <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; line-height: 1.35;">
+                      <a href="/tin-tuc/<%= post.slug %>" style="color: var(--gov-text);"><%= post.title %></a>
+                    </h4>
+                    <p style="font-size: 0.85rem; color: var(--gov-text-muted); line-height: 1.4; margin-top: auto;">
+                      <%= post.summary.substring(0, 90) %>...
+                    </p>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tenders Preview Section -->
+        <div class="gov-card">
+          <div class="card-header-gov">
+            <h3><i class="fa-solid fa-file-contract"></i> Thông Tin Gói Thầu Mới Nhất</h3>
+            <a href="/goi-thau" style="color: var(--gov-gold-light); font-size: 0.85rem;"><i class="fa-solid fa-angles-right"></i> Xem tất cả gói thầu</a>
+          </div>
+          <div class="card-body-gov" style="padding: 0;">
+            <table class="gov-table">
+              <thead>
+                <tr>
+                  <th>Mã Gói Thầu</th>
+                  <th>Tên Gói Thầu</th>
+                  <th>Giá Gói Thầu</th>
+                  <th>Hạn Nộp HS</th>
+                  <th>Trạng Thái</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% tenders.forEach(t => { %>
+                  <tr>
+                    <td><strong><%= t.code %></strong></td>
+                    <td><a href="/goi-thau" style="font-weight: 600;"><%= t.title %></a></td>
+                    <td style="color: var(--gov-red); font-weight: bold;"><%= t.budget %></td>
+                    <td><small><%= t.deadline %></small></td>
+                    <td>
+                      <span class="badge-gov <%= t.status === 'Đang mời thầu' ? 'badge-green' : 'badge-red' %>">
+                        <%= t.status %>
+                      </span>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Sidebar Column -->
+      <div class="sidebar-column">
+        
+        <!-- Announcements Widget -->
+        <div class="sidebar-widget">
+          <div class="widget-title">
+            <i class="fa-solid fa-bullhorn"></i> Thông Báo Khẩn & Chỉ Đạo
+          </div>
+          <div class="widget-content">
+            <ul class="notice-list">
+              <% announcements.forEach(item => { %>
+                <li class="notice-item">
+                  <span style="font-size: 0.75rem; color: var(--gov-red); font-weight: bold;">
+                    <i class="fa-regular fa-clock"></i> <%= item.created_at.substring(0, 10) %>
+                  </span>
+                  <a href="/tin-tuc/<%= item.slug %>"><%= item.title %></a>
+                </li>
+              <% }); %>
+            </ul>
+            <div style="margin-top: 12px; text-align: right;">
+              <a href="/thong-bao" style="font-size: 0.85rem; font-weight: 600;"><i class="fa-solid fa-arrow-right"></i> Xem tất cả thông báo</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Public Services Shortcuts Widget -->
+        <div class="sidebar-widget">
+          <div class="widget-title">
+            <i class="fa-solid fa-list-check"></i> Thủ Tục Phổ Biến
+          </div>
+          <div class="widget-content">
+            <ul class="notice-list">
+              <% services.forEach(s => { %>
+                <li class="notice-item">
+                  <a href="/dich-vu-cong/<%= s.id %>">
+                    <i class="fa-solid fa-file-lines" style="color: var(--gov-navy); margin-right: 4px;"></i> <%= s.title %>
+                  </a>
+                  <small style="color: var(--gov-text-muted); font-size: 0.75rem;">Thời hạn: <%= s.time_limit %></small>
+                </li>
+              <% }); %>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Emergency Contact Widget -->
+        <div class="sidebar-widget" style="border-left: 4px solid var(--gov-red);">
+          <div class="widget-title" style="background: var(--gov-red);">
+            <i class="fa-solid fa-phone"></i> Đường Dây Nóng Khẩn Cấp
+          </div>
+          <div class="widget-content" style="text-align: center;">
+            <p style="font-size: 0.9rem; margin-bottom: 8px;">Tiếp nhận phản ánh an sinh & cứu trợ khẩn cấp xã Mỹ Thiện:</p>
+            <h3 style="color: var(--gov-red); font-size: 1.3rem; margin-bottom: 5px;">0273.3855.123</h3>
+            <p style="font-size: 0.8rem; color: var(--gov-text-muted);">Trực ban 24/7 (Cán bộ trực xã)</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>

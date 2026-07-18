@@ -1,0 +1,103 @@
+<%- include('../partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <div class="admin-wrapper">
+      
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <div style="padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
+          <h4 style="color: var(--gov-gold-light); font-size: 0.95rem; text-transform: uppercase;">
+            <i class="fa-solid fa-user-gear"></i> <%= currentUser.fullname %>
+          </h4>
+          <small style="color: #bdc3c7;">Quyền: <%= currentUser.role %></small>
+        </div>
+
+        <ul class="admin-menu">
+          <li class="active"><a href="/admin"><i class="fa-solid fa-gauge"></i> Tổng quan Báo cáo</a></li>
+          <li><a href="/admin/posts"><i class="fa-solid fa-newspaper"></i> Quản lý Bài viết & Tin</a></li>
+          <li><a href="/admin/tenders"><i class="fa-solid fa-file-contract"></i> Quản lý Gói Thầu</a></li>
+          <li><a href="/admin/services"><i class="fa-solid fa-hands-holding-child"></i> Quản lý Dịch vụ công</a></li>
+          <li><a href="/admin/contacts"><i class="fa-solid fa-comments"></i> Ý kiến Phản ánh</a></li>
+          <li style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);"><a href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Cổng Công Khai</a></li>
+          <li><a href="/admin/logout" style="color: #ff9999;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+        </ul>
+      </aside>
+
+      <!-- Admin Content Area -->
+      <section class="admin-content">
+        
+        <h2 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--gov-navy); margin-bottom: 20px;">
+          BẢNG ĐIỀU KHIỂN QUẢN TRỊ NỘI DUNG
+        </h2>
+
+        <!-- Stats Grid Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px;">
+          <div style="background: #fff; border-left: 4px solid var(--gov-navy); border-radius: 6px; padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+            <div style="font-size: 0.85rem; color: var(--gov-text-muted);">Tổng Bài viết & Thông báo</div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--gov-navy);"><%= postsCount %></div>
+          </div>
+          <div style="background: #fff; border-left: 4px solid var(--gov-gold); border-radius: 6px; padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+            <div style="font-size: 0.85rem; color: var(--gov-text-muted);">Gói Thầu Mua Sắm</div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--gov-gold);"><%= tendersCount %></div>
+          </div>
+          <div style="background: #fff; border-left: 4px solid #27ae60; border-radius: 6px; padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+            <div style="font-size: 0.85rem; color: var(--gov-text-muted);">Thủ tục Dịch vụ công</div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: #27ae60;"><%= servicesCount %></div>
+          </div>
+          <div style="background: #fff; border-left: 4px solid var(--gov-red); border-radius: 6px; padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+            <div style="font-size: 0.85rem; color: var(--gov-text-muted);">Phản ánh của Nhân dân</div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--gov-red);"><%= contactsCount %></div>
+          </div>
+        </div>
+
+        <!-- Quick Action Bar -->
+        <div style="margin-bottom: 25px;">
+          <a href="/admin/posts/create" class="btn-gov btn-gov-red">
+            <i class="fa-solid fa-plus"></i> Đăng Bài Viết / Thông Báo Mới
+          </a>
+        </div>
+
+        <!-- Recent Posts Table -->
+        <div style="background: white; border-radius: 6px; border: 1px solid var(--gov-border); overflow: hidden; margin-bottom: 25px;">
+          <div style="background: var(--gov-navy); color: white; padding: 12px 18px; font-weight: bold;">
+            <i class="fa-solid fa-clock-rotate-left"></i> BÀI VIẾT GẦN ĐÂY
+          </div>
+          <table class="gov-table">
+            <thead>
+              <tr>
+                <th>Tiêu đề</th>
+                <th>Loại</th>
+                <th>Ngày đăng</th>
+                <th>Lượt xem</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recentPosts.forEach(p => { %>
+                <tr>
+                  <td><a href="/tin-tuc/<%= p.slug %>" target="_blank"><strong><%= p.title %></strong></a></td>
+                  <td>
+                    <span class="badge-gov <%= p.type === 'news' ? 'badge-blue' : 'badge-red' %>">
+                      <%= p.type === 'news' ? 'Tin tức' : 'Thông báo' %>
+                    </span>
+                  </td>
+                  <td><small><%= p.created_at %></small></td>
+                  <td><%= p.views %></td>
+                  <td>
+                    <a href="/admin/posts/edit/<%= p.id %>" class="btn-gov btn-gov-sm btn-gov-primary">Sửa</a>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

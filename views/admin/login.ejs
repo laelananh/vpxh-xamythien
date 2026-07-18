@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/gov-style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #07263c 0%, #0b3c5d 60%, #c0392b 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-card {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    .login-header {
+      background: var(--gov-navy);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      border-bottom: 4px solid var(--gov-gold);
+    }
+    .login-body {
+      padding: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <div class="login-header">
+      <div style="font-size: 36px; color: var(--gov-gold); margin-bottom: 8px;"><i class="fa-solid fa-user-shield"></i></div>
+      <h2 style="font-size: 1.2rem; text-transform: uppercase;">ĐĂNG NHẬP QUẢN TRỊ</h2>
+      <p style="font-size: 0.85rem; color: #d0d7de; margin-top: 4px;">VĂN PHÒNG XÃ HỘI XÃ MỸ THIỆN</p>
+    </div>
+    <div class="login-body">
+
+      <% if (error === 'invalid') { %>
+        <div style="background: #f8d7da; color: #721c24; padding: 10px 14px; border-radius: 4px; font-size: 0.85rem; margin-bottom: 20px; text-align: center;">
+          <i class="fa-solid fa-circle-exclamation"></i> Tên đăng nhập hoặc mật khẩu không chính xác.
+        </div>
+      <% } else if (error === 'unauthorized') { %>
+        <div style="background: #fff3cd; color: #856404; padding: 10px 14px; border-radius: 4px; font-size: 0.85rem; margin-bottom: 20px; text-align: center;">
+          <i class="fa-solid fa-triangle-exclamation"></i> Vui lòng đăng nhập để truy cập trang quản trị.
+        </div>
+      <% } %>
+
+      <form action="/admin/login" method="POST">
+        <div class="form-group">
+          <label><i class="fa-solid fa-user"></i> Tên tài khoản</label>
+          <input type="text" name="username" class="form-control" placeholder="Tài khoản (mặc định: admin)" required autofocus>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 25px;">
+          <label><i class="fa-solid fa-key"></i> Mật khẩu</label>
+          <input type="password" name="password" class="form-control" placeholder="Mật khẩu (mặc định: admin123)" required>
+        </div>
+
+        <button type="submit" class="btn-gov btn-gov-red" style="width: 100%; font-size: 1rem; padding: 12px;">
+          <i class="fa-solid fa-right-to-bracket"></i> Đăng Nhập Hệ Thống
+        </button>
+      </form>
+
+      <div style="margin-top: 20px; text-align: center;">
+        <a href="/" style="font-size: 0.85rem; color: var(--gov-navy);"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ công khai</a>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

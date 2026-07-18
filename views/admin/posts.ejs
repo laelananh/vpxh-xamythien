@@ -1,0 +1,93 @@
+<%- include('../partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <div class="admin-wrapper">
+      
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <ul class="admin-menu">
+          <li><a href="/admin"><i class="fa-solid fa-gauge"></i> Tổng quan Báo cáo</a></li>
+          <li class="active"><a href="/admin/posts"><i class="fa-solid fa-newspaper"></i> Quản lý Bài viết & Tin</a></li>
+          <li><a href="/admin/tenders"><i class="fa-solid fa-file-contract"></i> Quản lý Gói Thầu</a></li>
+          <li><a href="/admin/services"><i class="fa-solid fa-hands-holding-child"></i> Quản lý Dịch vụ công</a></li>
+          <li><a href="/admin/contacts"><i class="fa-solid fa-comments"></i> Ý kiến Phản ánh</a></li>
+          <li style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);"><a href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Cổng Công Khai</a></li>
+          <li><a href="/admin/logout" style="color: #ff9999;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+        </ul>
+      </aside>
+
+      <!-- Admin Content -->
+      <section class="admin-content">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+          <h2 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--gov-navy);">
+            QUẢN LÝ BÀI VIẾT & THÔNG BÁO
+          </h2>
+          <a href="/admin/posts/create" class="btn-gov btn-gov-red">
+            <i class="fa-solid fa-plus"></i> Đăng Bài Mới
+          </a>
+        </div>
+
+        <div style="background: white; border: 1px solid var(--gov-border); border-radius: 6px; overflow: hidden; box-shadow: var(--gov-shadow);">
+          <table class="gov-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Hình ảnh</th>
+                <th>Tiêu đề bài viết</th>
+                <th>Loại</th>
+                <th>Chuyên mục</th>
+                <th>Nổi bật</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% posts.forEach(post => { %>
+                <tr>
+                  <td><%= post.id %></td>
+                  <td>
+                    <img src="<%= post.image_url %>" alt="<%= post.title %>" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;">
+                  </td>
+                  <td>
+                    <a href="/tin-tuc/<%= post.slug %>" target="_blank" style="font-weight: 600; color: var(--gov-navy);">
+                      <%= post.title %>
+                    </a>
+                  </td>
+                  <td>
+                    <span class="badge-gov <%= post.type === 'news' ? 'badge-blue' : 'badge-red' %>">
+                      <%= post.type === 'news' ? 'Tin tức' : 'Thông báo' %>
+                    </span>
+                  </td>
+                  <td><small><%= post.category_id %></small></td>
+                  <td>
+                    <% if (post.is_featured) { %>
+                      <i class="fa-solid fa-circle-check" style="color: var(--gov-gold); font-size: 18px;"></i>
+                    <% } %>
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 6px;">
+                      <a href="/admin/posts/edit/<%= post.id %>" class="btn-gov btn-gov-sm btn-gov-primary" title="Sửa">
+                        <i class="fa-solid fa-pen"></i> Sửa
+                      </a>
+                      <form action="/admin/posts/delete/<%= post.id %>" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài viết này?')">
+                        <button type="submit" class="btn-gov btn-gov-sm btn-gov-red" title="Xóa">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

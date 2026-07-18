@@ -1,0 +1,96 @@
+<%- include('partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--gov-text-muted);">
+      <a href="/"><i class="fa-solid fa-house"></i> Trang chủ</a> / <strong style="color: var(--gov-navy);">Liên Hệ</strong>
+    </div>
+
+    <div class="layout-grid">
+      
+      <!-- Contact Form -->
+      <div class="main-column">
+        <div class="gov-card">
+          <div class="card-header-gov">
+            <h3><i class="fa-solid fa-comments"></i> GỬI PHẢN ÁNH - KIẾN NGHỊ - CÂU HỎI</h3>
+          </div>
+          <div class="card-body-gov">
+            
+            <% if (msg === 'success') { %>
+              <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-circle-check" style="font-size: 24px;"></i>
+                <div>
+                  <strong>Gửi phản ánh thành công!</strong> Cán bộ Văn phòng Xã hội Xã Mỹ Thiện đã tiếp nhận ý kiến của bạn và sẽ phản hồi trong thời gian sớm nhất.
+                </div>
+              </div>
+            <% } else if (msg === 'error') { %>
+              <div style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                <strong>Có lỗi xảy ra:</strong> Vui lòng điền đầy đủ các thông tin bắt buộc (*).
+              </div>
+            <% } %>
+
+            <form action="/lien-he" method="POST">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                  <label>Họ và tên người gửi <span style="color: var(--gov-red);">*</span></label>
+                  <input type="text" name="fullname" class="form-control" placeholder="Nhập họ tên công dân" required>
+                </div>
+                <div class="form-group">
+                  <label>Số điện thoại liên hệ <span style="color: var(--gov-red);">*</span></label>
+                  <input type="tel" name="phone" class="form-control" placeholder="Nhập số điện thoại" required>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                  <label>Địa chỉ Email</label>
+                  <input type="email" name="email" class="form-control" placeholder="example@gmail.com">
+                </div>
+                <div class="form-group">
+                  <label>Địa chỉ cư trú (Ấp/Xã)</label>
+                  <input type="text" name="address" class="form-control" placeholder="Ví dụ: Ấp Mỹ Phú, Xã Mỹ Thiện">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Tiêu đề phản ánh / câu hỏi <span style="color: var(--gov-red);">*</span></label>
+                <input type="text" name="title" class="form-control" placeholder="Tóm tắt nội dung kiến nghị" required>
+              </div>
+
+              <div class="form-group">
+                <label>Nội dung chi tiết <span style="color: var(--gov-red);">*</span></label>
+                <textarea name="content" class="form-control" rows="5" placeholder="Mô tả rõ ràng vấn đề, thời gian, vụ việc cần hỏi đáp hoặc phản ánh..." required></textarea>
+              </div>
+
+              <button type="submit" class="btn-gov btn-gov-red" style="font-size: 1rem; padding: 12px 25px;">
+                <i class="fa-solid fa-paper-plane"></i> Gửi Ý Kiến Phản Ánh
+              </button>
+            </form>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Sidebar Info -->
+      <div class="sidebar-column">
+        <div class="sidebar-widget">
+          <div class="widget-title">
+            <i class="fa-solid fa-location-dot"></i> Thông Tin Trụ Sở
+          </div>
+          <div class="widget-content" style="line-height: 1.8; font-size: 0.95rem;">
+            <p style="margin-bottom: 10px;"><strong><i class="fa-solid fa-building"></i> Trụ sở:</strong><br>UBND Xã Mỹ Thiện, Huyện Cái Bè, Tỉnh Tiền Giang.</p>
+            <p style="margin-bottom: 10px;"><strong><i class="fa-solid fa-phone"></i> Điện thoại bàn:</strong><br>0273.3855.123</p>
+            <p style="margin-bottom: 10px;"><strong><i class="fa-solid fa-envelope"></i> Email tiếp nhận:</strong><br><%= settings.email %></p>
+            <p><strong><i class="fa-solid fa-clock"></i> Giờ tiếp công dân:</strong><br>Sáng 07h30 - 11h30<br>Chiều 13h30 - 17h00</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>

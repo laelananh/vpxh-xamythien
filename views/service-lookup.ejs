@@ -1,0 +1,84 @@
+<%- include('partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--gov-text-muted);">
+      <a href="/"><i class="fa-solid fa-house"></i> Trang chủ</a> / 
+      <a href="/dich-vu-cong">Dịch Vụ Công</a> / 
+      <strong style="color: var(--gov-navy);">Tra cứu hồ sơ</strong>
+    </div>
+
+    <div class="gov-card">
+      <div class="card-header-gov">
+        <h3><i class="fa-solid fa-barcode"></i> TRA CỨU MÃ SỐ HỒ SƠ DỊCH VỤ CÔNG</h3>
+      </div>
+      <div class="card-body-gov">
+        
+        <p style="margin-bottom: 20px; color: var(--gov-text-muted);">
+          Nhập mã số hồ sơ (In trên Biên nhận hồ sơ hoặc gửi qua tin nhắn SMS) để kiểm tra tiến độ xử lý tại Văn phòng Xã hội Xã Mỹ Thiện.
+        </p>
+
+        <form action="/dich-vu-cong/tra-cuu" method="GET" style="display: flex; gap: 10px; margin-bottom: 30px; max-width: 600px;">
+          <input type="text" name="code" value="<%= code %>" placeholder="Ví dụ: HS-2026-8899, HS-9988..." class="form-control" required style="font-size: 1.05rem; padding: 12px;">
+          <button type="submit" class="btn-gov btn-gov-primary" style="white-space: nowrap;">
+            <i class="fa-solid fa-magnifying-glass"></i> Tra cứu
+          </button>
+        </form>
+
+        <% if (code && result) { %>
+          <div style="border: 2px solid var(--gov-navy); border-radius: 6px; padding: 20px; background: #fff; box-shadow: var(--gov-shadow);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gov-border); padding-bottom: 12px; margin-bottom: 15px;">
+              <h3 style="color: var(--gov-navy); font-size: 1.2rem;">Kết quả tra cứu hồ sơ: <span style="color: var(--gov-red);"><%= result.code %></span></h3>
+              <span class="badge-gov <%= result.status.includes('Sẵn sàng') ? 'badge-green' : 'badge-yellow' %>" style="font-size: 0.85rem; padding: 6px 12px;">
+                <%= result.status %>
+              </span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; font-size: 0.95rem; margin-bottom: 20px;">
+              <div><strong>Người nộp:</strong> <%= result.applicant %></div>
+              <div><strong>Tên thủ tục:</strong> <%= result.service_name %></div>
+              <div><strong>Ngày nộp hồ sơ:</strong> <%= result.submitted_date %></div>
+              <div><strong>Hẹn trả kết quả:</strong> <span style="color: var(--gov-red); font-weight: bold;"><%= result.expected_date %></span></div>
+              <div><strong>Đơn vị xử lý:</strong> <%= result.department %></div>
+            </div>
+
+            <!-- Progress Timeline Stepper -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-top: 15px;">
+              <h4 style="font-size: 0.95rem; color: var(--gov-navy); margin-bottom: 15px;"><i class="fa-solid fa-route"></i> Tiến trình xử lý hồ sơ:</h4>
+              <div style="display: flex; justify-content: space-between; position: relative; gap: 10px; flex-wrap: wrap;">
+                <div style="text-align: center; flex: 1;">
+                  <div style="width: 36px; height: 36px; background: var(--gov-navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">1</div>
+                  <small style="font-weight: bold;">Tiếp nhận hồ sơ</small>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                  <div style="width: 36px; height: 36px; background: var(--gov-navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">2</div>
+                  <small style="font-weight: bold;">Thẩm định điều kiện</small>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                  <div style="width: 36px; height: 36px; background: <%= result.status.includes('Sẵn sàng') ? 'var(--gov-navy)' : '#cbd5e1' %>; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">3</div>
+                  <small style="font-weight: bold;">Ký phê duyệt</small>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                  <div style="width: 36px; height: 36px; background: <%= result.status.includes('Sẵn sàng') ? 'var(--gov-red)' : '#cbd5e1' %>; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">4</div>
+                  <small style="font-weight: bold;">Trả kết quả</small>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        <% } else if (code) { %>
+          <div style="text-align: center; padding: 30px; color: var(--gov-red);">
+            <i class="fa-solid fa-circle-xmark" style="font-size: 48px; margin-bottom: 10px;"></i>
+            <p>Không tìm thấy dữ liệu hồ sơ với mã "<%= code %>". Vui lòng kiểm tra lại chính xác mã ghi trên giấy biên nhận.</p>
+          </div>
+        <% } %>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,75 @@
+<%- include('partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--gov-text-muted);">
+      <a href="/"><i class="fa-solid fa-house"></i> Trang chủ</a> / <strong style="color: var(--gov-navy);">Gói Thầu</strong>
+    </div>
+
+    <div class="gov-card">
+      <div class="card-header-gov">
+        <h3><i class="fa-solid fa-file-contract"></i> DONG THÔNG TIN GÓI THẦU MUA SẮM CÔNG XÃ MỸ THIỆN</h3>
+      </div>
+      <div class="card-body-gov">
+        
+        <!-- Search Filter -->
+        <form action="/goi-thau" method="GET" style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+          <input type="text" name="q" value="<%= search %>" placeholder="Nhập từ khóa tìm kiếm gói thầu, mã thầu..." class="form-control" style="flex-grow: 1; max-width: 500px;">
+          <button type="submit" class="btn-gov btn-gov-primary"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+          <% if (search) { %>
+            <a href="/goi-thau" class="btn-gov" style="background: #e0e0e0; color: #333;"><i class="fa-solid fa-xmark"></i> Xóa lọc</a>
+          <% } %>
+        </form>
+
+        <% if (tenders.length === 0) { %>
+          <div style="text-align: center; padding: 40px; color: var(--gov-text-muted);">
+            <i class="fa-solid fa-folder-open" style="font-size: 48px; margin-bottom: 10px; opacity: 0.5;"></i>
+            <p>Không tìm thấy gói thầu nào phù hợp với từ khóa "<%= search %>".</p>
+          </div>
+        <% } else { %>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <% tenders.forEach(t => { %>
+              <div style="border: 1px solid var(--gov-border); border-left: 5px solid <%= t.status === 'Đang mời thầu' ? 'var(--gov-navy)' : '#95a5a6' %>; border-radius: 6px; padding: 20px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; flex-wrap: wrap; margin-bottom: 12px;">
+                  <div>
+                    <span class="badge-gov badge-blue" style="margin-bottom: 5px; display: inline-block;"><%= t.code %></span>
+                    <h3 style="font-size: 1.15rem; color: var(--gov-navy); margin-top: 4px; line-height: 1.4;"><%= t.title %></h3>
+                  </div>
+                  <span class="badge-gov <%= t.status === 'Đang mời thầu' ? 'badge-green' : 'badge-red' %>" style="font-size: 0.85rem; padding: 6px 12px;">
+                    <i class="fa-solid <%= t.status === 'Đang mời thầu' ? 'fa-folder-open' : 'fa-lock' %>"></i> <%= t.status %>
+                  </span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: #f8f9fa; padding: 12px; border-radius: 4px; font-size: 0.9rem; margin-bottom: 15px;">
+                  <div><strong>Bên mời thầu:</strong> <%= t.investor %></div>
+                  <div><strong>Giá gói thầu:</strong> <span style="color: var(--gov-red); font-weight: bold;"><%= t.budget %></span></div>
+                  <div><strong>Lĩnh vực:</strong> <%= t.field %></div>
+                  <div><strong>Hạn nộp hồ sơ:</strong> <span style="color: var(--gov-navy); font-weight: bold;"><%= t.deadline %></span></div>
+                </div>
+
+                <p style="font-size: 0.95rem; color: var(--gov-text); line-height: 1.6; margin-bottom: 15px;">
+                  <%= t.content %>
+                </p>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--gov-border); padding-top: 12px;">
+                  <small style="color: var(--gov-text-muted);"><i class="fa-regular fa-clock"></i> Ngày đăng: <%= t.published_at %></small>
+                  <div>
+                    <a href="javascript:void(0)" onclick="alert('Đang tải hồ sơ mời thầu <%= t.code %> (File PDF Demo)...')" class="btn-gov btn-gov-sm btn-gov-primary">
+                      <i class="fa-solid fa-file-pdf"></i> Tải HSMT (PDF)
+                    </a>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } %>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>

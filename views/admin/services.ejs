@@ -1,0 +1,122 @@
+<%- include('../partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <div class="admin-wrapper">
+      
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <ul class="admin-menu">
+          <li><a href="/admin"><i class="fa-solid fa-gauge"></i> Tổng quan Báo cáo</a></li>
+          <li><a href="/admin/posts"><i class="fa-solid fa-newspaper"></i> Quản lý Bài viết & Tin</a></li>
+          <li><a href="/admin/tenders"><i class="fa-solid fa-file-contract"></i> Quản lý Gói Thầu</a></li>
+          <li class="active"><a href="/admin/services"><i class="fa-solid fa-hands-holding-child"></i> Quản lý Dịch vụ công</a></li>
+          <li><a href="/admin/contacts"><i class="fa-solid fa-comments"></i> Ý kiến Phản ánh</a></li>
+          <li style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);"><a href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Cổng Công Khai</a></li>
+          <li><a href="/admin/logout" style="color: #ff9999;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+        </ul>
+      </aside>
+
+      <!-- Admin Content -->
+      <section class="admin-content">
+        
+        <h2 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--gov-navy); margin-bottom: 20px;">
+          QUẢN LÝ THỦ TỤC DỊCH VỤ CÔNG & BIỂU MẪU
+        </h2>
+
+        <!-- Create Service Form Card -->
+        <div style="background: white; border: 1px solid var(--gov-border); border-radius: 6px; padding: 20px; margin-bottom: 25px; box-shadow: var(--gov-shadow);">
+          <h3 style="font-size: 1.1rem; color: var(--gov-navy); margin-bottom: 15px; border-bottom: 2px solid var(--gov-gold); padding-bottom: 5px;">
+            <i class="fa-solid fa-plus-circle"></i> THÊM THỦ TỤC HÀNH CHÍNH MỚI
+          </h3>
+
+          <form action="/admin/services/create" method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
+              <div class="form-group">
+                <label>Mã thủ tục <span style="color: var(--gov-red);">*</span></label>
+                <input type="text" name="code" placeholder="Ví dụ: TTHC-XH-05" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>Tên thủ tục hành chính <span style="color: var(--gov-red);">*</span></label>
+                <input type="text" name="title" placeholder="Nhập tên thủ tục..." class="form-control" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px;">
+              <div class="form-group">
+                <label>Lĩnh vực</label>
+                <input type="text" name="category" value="Bảo trợ Xã hội" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Mức độ DVC</label>
+                <select name="level" class="form-control">
+                  <option value="Dịch vụ công Trực tuyến Toàn trình">Toàn trình</option>
+                  <option value="Dịch vụ công Trực tuyến Một phần">Một phần</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Thời hạn giải quyết</label>
+                <input type="text" name="time_limit" value="05 ngày làm việc" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Lệ phí</label>
+                <input type="text" name="fee" value="Miễn phí" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Các bước thực hiện (Mỗi bước 1 dòng)</label>
+              <textarea name="steps" class="form-control" rows="3" placeholder="Bước 1: Nộp hồ sơ&#10;Bước 2: Thẩm định&#10;Bước 3: Trả kết quả"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Thành phần hồ sơ nộp (Mỗi giấy tờ 1 dòng)</label>
+              <textarea name="dossier" class="form-control" rows="3" placeholder="Tờ khai đề nghị&#10;Bản sao CCCD&#10;Giấy xác nhận liên quan"></textarea>
+            </div>
+
+            <button type="submit" class="btn-gov btn-gov-primary">
+              <i class="fa-solid fa-floppy-disk"></i> Lưu Thủ Tục Mới
+            </button>
+          </form>
+        </div>
+
+        <!-- Services List Table -->
+        <div style="background: white; border: 1px solid var(--gov-border); border-radius: 6px; overflow: hidden; box-shadow: var(--gov-shadow);">
+          <table class="gov-table">
+            <thead>
+              <tr>
+                <th>Mã TTHC</th>
+                <th>Tên Thủ Tục</th>
+                <th>Lĩnh vực</th>
+                <th>Thời hạn</th>
+                <th>Mức độ</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% services.forEach(s => { %>
+                <tr>
+                  <td><strong><%= s.code %></strong></td>
+                  <td><a href="/dich-vu-cong/<%= s.id %>" target="_blank"><%= s.title %></a></td>
+                  <td><small><%= s.category %></small></td>
+                  <td><small><%= s.time_limit %></small></td>
+                  <td><span class="badge-gov badge-green"><%= s.level.includes('Toàn trình') ? 'Toàn trình' : 'Một phần' %></span></td>
+                  <td>
+                    <form action="/admin/services/delete/<%= s.id %>" method="POST" onsubmit="return confirm('Xóa thủ tục này?')">
+                      <button type="submit" class="btn-gov btn-gov-sm btn-gov-red"><i class="fa-solid fa-trash"></i> Xóa</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

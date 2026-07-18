@@ -1,0 +1,108 @@
+<%- include('partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--gov-text-muted);">
+      <a href="/"><i class="fa-solid fa-house"></i> Trang chủ</a> / 
+      <a href="/tin-tuc">Tin Tức - Sự Kiện</a> / 
+      <strong style="color: var(--gov-navy);"><%= post.title.substring(0, 40) %>...</strong>
+    </div>
+
+    <div class="layout-grid">
+      
+      <!-- Main Article Content -->
+      <div class="main-column">
+        <div class="gov-card">
+          <div class="card-body-gov" style="padding: 30px;">
+            
+            <!-- Article Title -->
+            <h1 style="font-family: var(--font-heading); font-size: 1.65rem; color: var(--gov-navy); line-height: 1.4; margin-bottom: 15px;">
+              <%= post.title %>
+            </h1>
+
+            <!-- Article Meta Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 15px; border-radius: 4px; font-size: 0.85rem; color: var(--gov-text-muted); margin-bottom: 25px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <i class="fa-regular fa-calendar-check" style="color: var(--gov-red);"></i> Ngày đăng: <strong><%= post.created_at %></strong> | 
+                <i class="fa-regular fa-eye"></i> Lượt xem: <strong><%= post.views %></strong>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <button id="btn-tts" class="btn-gov btn-gov-sm btn-gov-primary" style="padding: 4px 10px; font-size: 0.8rem;">
+                  <i class="fa-solid fa-volume-high"></i> Đọc bài viết
+                </button>
+                <button onclick="window.print()" class="btn-gov btn-gov-sm" style="padding: 4px 10px; font-size: 0.8rem; background: #e0e0e0; color: #333;">
+                  <i class="fa-solid fa-print"></i> In trang
+                </button>
+              </div>
+            </div>
+
+            <!-- Summary Sapeur -->
+            <div style="font-size: 1.05rem; font-weight: bold; line-height: 1.6; color: #333; background: #eef2f5; padding: 15px; border-left: 4px solid var(--gov-navy); margin-bottom: 25px; border-radius: 0 4px 4px 0;">
+              <%= post.summary %>
+            </div>
+
+            <!-- Cover Image if present -->
+            <% if (post.image_url) { %>
+              <div style="text-align: center; margin-bottom: 25px;">
+                <img src="<%= post.image_url %>" alt="<%= post.title %>" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: var(--gov-shadow);">
+                <div style="font-size: 0.85rem; color: var(--gov-text-muted); margin-top: 6px; font-style: italic;">
+                  Hình ảnh hoạt động tại Văn phòng Xã hội Xã Mỹ Thiện
+                </div>
+              </div>
+            <% } %>
+
+            <!-- Main Body HTML Content -->
+            <div class="article-body" style="line-height: 1.8; font-size: 1.05rem; color: #2c3e50;">
+              <%- post.content %>
+            </div>
+
+            <!-- Author Signature -->
+            <div style="margin-top: 40px; text-align: right; font-style: italic; color: var(--gov-navy); font-weight: bold;">
+              VĂN PHÒNG XÃ HỘI XÃ MỸ THIỆN
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Related Posts -->
+      <div class="sidebar-column">
+        <div class="sidebar-widget">
+          <div class="widget-title">
+            <i class="fa-solid fa-newspaper"></i> Tin Liên Quan
+          </div>
+          <div class="widget-content">
+            <ul class="notice-list">
+              <% relatedPosts.forEach(rel => { %>
+                <li class="notice-item" style="padding: 12px 0;">
+                  <small style="color: var(--gov-text-muted); display: block;"><i class="fa-regular fa-clock"></i> <%= rel.created_at.substring(0, 10) %></small>
+                  <a href="/tin-tuc/<%= rel.slug %>" style="font-weight: 600; font-size: 0.9rem; line-height: 1.35; margin-top: 3px; display: block;">
+                    <%= rel.title %>
+                  </a>
+                </li>
+              <% }); %>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-widget">
+          <div class="widget-title" style="background: var(--gov-navy-dark);">
+            <i class="fa-solid fa-headset"></i> Tổng Đài Tiếp Nhận
+          </div>
+          <div class="widget-content" style="text-align: center; line-height: 1.6;">
+            <p style="font-size: 0.85rem;">Bạn có thắc mắc về bài viết hoặc thông báo này?</p>
+            <a href="/lien-he" class="btn-gov btn-gov-sm btn-gov-red" style="margin-top: 10px; width: 100%;">
+              <i class="fa-solid fa-paper-plane"></i> Gửi phản ánh ngay
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>

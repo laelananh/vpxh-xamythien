@@ -1,0 +1,127 @@
+<%- include('../partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <div class="admin-wrapper">
+      
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <ul class="admin-menu">
+          <li><a href="/admin"><i class="fa-solid fa-gauge"></i> Tổng quan Báo cáo</a></li>
+          <li><a href="/admin/posts"><i class="fa-solid fa-newspaper"></i> Quản lý Bài viết & Tin</a></li>
+          <li class="active"><a href="/admin/tenders"><i class="fa-solid fa-file-contract"></i> Quản lý Gói Thầu</a></li>
+          <li><a href="/admin/services"><i class="fa-solid fa-hands-holding-child"></i> Quản lý Dịch vụ công</a></li>
+          <li><a href="/admin/contacts"><i class="fa-solid fa-comments"></i> Ý kiến Phản ánh</a></li>
+          <li style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);"><a href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Cổng Công Khai</a></li>
+          <li><a href="/admin/logout" style="color: #ff9999;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+        </ul>
+      </aside>
+
+      <!-- Admin Content -->
+      <section class="admin-content">
+        
+        <h2 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--gov-navy); margin-bottom: 20px;">
+          QUẢN LÝ GÓI THẦU MUA SẮM CÔNG
+        </h2>
+
+        <!-- Create Tender Form Card -->
+        <div style="background: white; border: 1px solid var(--gov-border); border-radius: 6px; padding: 20px; margin-bottom: 25px; box-shadow: var(--gov-shadow);">
+          <h3 style="font-size: 1.1rem; color: var(--gov-navy); margin-bottom: 15px; border-bottom: 2px solid var(--gov-gold); padding-bottom: 5px;">
+            <i class="fa-solid fa-plus-circle"></i> THÊM GÓI THẦU MỚI
+          </h3>
+
+          <form action="/admin/tenders/create" method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
+              <div class="form-group">
+                <label>Mã gói thầu <span style="color: var(--gov-red);">*</span></label>
+                <input type="text" name="code" placeholder="Ví dụ: GT-MT-2026-04" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>Tên gói thầu <span style="color: var(--gov-red);">*</span></label>
+                <input type="text" name="title" placeholder="Nhập tên gói thầu mua sắm công..." class="form-control" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px;">
+              <div class="form-group">
+                <label>Giá gói thầu</label>
+                <input type="text" name="budget" placeholder="Ví dụ: 250.000.000 VNĐ" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Bên mời thầu</label>
+                <input type="text" name="investor" value="Ủy ban nhân dân Xã Mỹ Thiện" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Lĩnh vực</label>
+                <input type="text" name="field" value="Mua sắm hàng hóa" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Trạng thái</label>
+                <select name="status" class="form-control">
+                  <option value="Đang mời thầu">Đang mời thầu</option>
+                  <option value="Đã đóng thầu">Đã đóng thầu</option>
+                  <option value="Đã duyệt kết quả">Đã duyệt kết quả</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Hạn nộp hồ sơ</label>
+              <input type="text" name="deadline" placeholder="Ví dụ: 30/08/2026 17:00" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label>Mô tả chi tiết gói thầu</label>
+              <textarea name="content" class="form-control" rows="3" placeholder="Nhập thông tin phạm vi cung cấp, địa điểm nhận HSMT..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-gov btn-gov-primary">
+              <i class="fa-solid fa-floppy-disk"></i> Đăng Gói Thầu
+            </button>
+          </form>
+        </div>
+
+        <!-- Tenders List Table -->
+        <div style="background: white; border: 1px solid var(--gov-border); border-radius: 6px; overflow: hidden; box-shadow: var(--gov-shadow);">
+          <table class="gov-table">
+            <thead>
+              <tr>
+                <th>Mã thầu</th>
+                <th>Tên gói thầu</th>
+                <th>Giá gói thầu</th>
+                <th>Hạn nộp</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% tenders.forEach(t => { %>
+                <tr>
+                  <td><strong><%= t.code %></strong></td>
+                  <td><%= t.title %></td>
+                  <td style="color: var(--gov-red); font-weight: bold;"><%= t.budget %></td>
+                  <td><small><%= t.deadline %></small></td>
+                  <td>
+                    <span class="badge-gov <%= t.status === 'Đang mời thầu' ? 'badge-green' : 'badge-red' %>">
+                      <%= t.status %>
+                    </span>
+                  </td>
+                  <td>
+                    <form action="/admin/tenders/delete/<%= t.id %>" method="POST" onsubmit="return confirm('Xóa gói thầu này?')">
+                      <button type="submit" class="btn-gov btn-gov-sm btn-gov-red"><i class="fa-solid fa-trash"></i> Xóa</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

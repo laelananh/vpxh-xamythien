@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | <%= settings.site_title %></title>
+  
+  <!-- Google Fonts & FontAwesome CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Gov Stylesheet -->
+  <link rel="stylesheet" href="/css/gov-style.css">
+</head>
+<body>
+
+  <!-- Top Utility Bar -->
+  <div class="gov-topbar">
+    <div class="container topbar-content">
+      <div class="topbar-left">
+        <span id="live-clock"><i class="fa-regular fa-calendar-days"></i> Đang tải ngày tháng...</span>
+        <span><i class="fa-solid fa-phone-volume"></i> Đường dây nóng: <strong><%= settings.phone %></strong></span>
+      </div>
+      <div class="topbar-right">
+        <div class="accessibility-tools">
+          <span style="margin-right: 5px; color: #fff8b3;"><i class="fa-solid fa-universal-access"></i> Cỡ chữ:</span>
+          <button id="btn-font-normal" title="Cỡ chữ chuẩn">A</button>
+          <button id="btn-font-large" title="Chữ lớn">A+</button>
+          <button id="btn-font-xlarge" title="Chữ rất lớn">A++</button>
+          <button id="btn-contrast" title="Chế độ tương phản cao"><i class="fa-solid fa-circle-half-stroke"></i> Tương phản</button>
+        </div>
+        <% if (currentUser) { %>
+          <a href="/admin" style="color: var(--gov-gold-light); margin-left: 10px; font-weight: bold;"><i class="fa-solid fa-user-gear"></i> Trang Quản Trị</a>
+          <a href="/admin/logout" style="color: #ff9999; margin-left: 10px;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+        <% } else { %>
+          <a href="/admin/login" style="color: #e0e0e0; margin-left: 10px;"><i class="fa-solid fa-lock"></i> Quản trị</a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official Government Header Banner -->
+  <header class="gov-header">
+    <div class="container">
+      <div class="header-brand">
+        <div class="emblem-box">
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <div class="brand-text">
+          <h2>ỦY BAN NHÂN DÂN XÃ MỸ THIỆN</h2>
+          <h1>VĂN PHÒNG XÃ HỘI XÃ MỸ THIỆN</h1>
+          <p><i class="fa-solid fa-shield-halved"></i> CỔNG THÔNG TIN ĐIỆN TỬ & DỊCH VỤ CÔNG AN SINH XÃ HỘI</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Navbar Menu -->
+  <nav class="gov-navbar">
+    <div class="container">
+      <ul class="nav-menu">
+        <li class="<%= currentPath === '/' ? 'active' : '' %>">
+          <a href="/"><i class="fa-solid fa-house"></i> Trang Chủ</a>
+        </li>
+        <li class="<%= currentPath.startsWith('/gioi-thieu') ? 'active' : '' %>">
+          <a href="/gioi-thieu"><i class="fa-solid fa-building-columns"></i> Giới Thiệu</a>
+        </li>
+        <li class="<%= currentPath.startsWith('/goi-thau') ? 'active' : '' %>">
+          <a href="/goi-thau"><i class="fa-solid fa-file-contract"></i> Gói Thầu</a>
+        </li>
+        <li class="<%= currentPath.startsWith('/tin-tuc') ? 'active' : '' %>">
+          <a href="/tin-tuc"><i class="fa-solid fa-newspaper"></i> Tin Tức - Sự Kiện</a>
+        </li>
+        <li class="<%= currentPath.startsWith('/thong-bao') ? 'active' : '' %>">
+          <a href="/thong-bao"><i class="fa-solid fa-bullhorn"></i> Thông Báo</a>
+        </li>
+        <li class="<%= currentPath.startsWith('/dich-vu-cong') ? 'active' : '' %>">
+          <a href="/dich-vu-cong"><i class="fa-solid fa-hands-holding-child"></i> Dịch Vụ Công</a>
+        </li>
+        <li class="<%= currentPath.startsWith('/lien-he') ? 'active' : '' %>">
+          <a href="/lien-he"><i class="fa-solid fa-address-book"></i> Liên Hệ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Announcement Ticker -->
+  <div class="gov-ticker">
+    <div class="container ticker-wrapper">
+      <div class="ticker-label"><i class="fa-solid fa-bell"></i> THÔNG BÁO MỚI</div>
+      <div class="ticker-content">
+        <div class="ticker-text">
+          <%= settings.banner_announcement %> - Lịch chi trả trợ cấp xã hội tháng 7/2026 diễn ra vào ngày 20-21/07 tại Trụ sở UBND xã Mỹ Thiện.
+        </div>
+      </div>
+    </div>
+  </div>

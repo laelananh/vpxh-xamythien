@@ -1,0 +1,76 @@
+<%- include('partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--gov-text-muted);">
+      <a href="/"><i class="fa-solid fa-house"></i> Trang chủ</a> / <strong style="color: var(--gov-navy);">Dịch Vụ Công</strong>
+    </div>
+
+    <!-- Hero Search Banner for DVC -->
+    <div style="background: linear-gradient(135deg, var(--gov-navy), var(--gov-navy-dark)); color: white; padding: 30px; border-radius: 6px; margin-bottom: 25px; border-left: 6px solid var(--gov-gold); box-shadow: var(--gov-shadow);">
+      <h2 style="font-size: 1.4rem; font-weight: 700; text-transform: uppercase; margin-bottom: 10px;">
+        <i class="fa-solid fa-hands-holding-child"></i> CỔNG DỊCH VỤ CÔNG TRỰC TUYẾN XÃ MỸ THIỆN
+      </h2>
+      <p style="font-size: 0.95rem; color: #e0e0e0; margin-bottom: 20px;">
+        Tra cứu thủ tục hành chính, nộp hồ sơ trực tuyến và tải biểu mẫu hướng dẫn thực hiện chính sách xã hội.
+      </p>
+
+      <form action="/dich-vu-cong" method="GET" style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <input type="text" name="q" value="<%= search %>" placeholder="Nhập tên thủ tục hành chính (ví dụ: trợ cấp xã hội, BHYT, mai táng phí...)" class="form-control" style="flex-grow: 1; min-width: 280px; font-size: 1rem; padding: 12px;">
+        <button type="submit" class="btn-gov btn-gov-red" style="font-size: 1rem; padding: 12px 24px;">
+          <i class="fa-solid fa-magnifying-glass"></i> Tìm Thủ Tục
+        </button>
+        <a href="/dich-vu-cong/tra-cuu" class="btn-gov" style="background: var(--gov-gold); color: black; font-weight: bold; padding: 12px 20px;">
+          <i class="fa-solid fa-barcode"></i> Tra cứu mã hồ sơ
+        </a>
+      </form>
+    </div>
+
+    <div class="gov-card">
+      <div class="card-header-gov">
+        <h3><i class="fa-solid fa-list-check"></i> DANH MỤC THỦ TỤC HÀNH CHÍNH</h3>
+      </div>
+      <div class="card-body-gov">
+        
+        <% if (services.length === 0) { %>
+          <div style="text-align: center; padding: 40px; color: var(--gov-text-muted);">
+            <i class="fa-solid fa-folder-minus" style="font-size: 48px; margin-bottom: 10px; opacity: 0.5;"></i>
+            <p>Không tìm thấy thủ tục hành chính nào phù hợp.</p>
+          </div>
+        <% } else { %>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <% services.forEach(s => { %>
+              <div style="border: 1px solid var(--gov-border); border-radius: 6px; padding: 18px; background: #fff; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                <div style="flex-grow: 1; max-width: 800px;">
+                  <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap;">
+                    <span class="badge-gov badge-blue"><%= s.code %></span>
+                    <span class="badge-gov badge-green"><%= s.level %></span>
+                    <span style="font-size: 0.8rem; color: var(--gov-text-muted);"><i class="fa-solid fa-layer-group"></i> <%= s.category %></span>
+                  </div>
+                  <h3 style="font-size: 1.1rem; color: var(--gov-navy); margin-bottom: 8px; line-height: 1.4;">
+                    <a href="/dich-vu-cong/<%= s.id %>"><%= s.title %></a>
+                  </h3>
+                  <div style="display: flex; gap: 20px; font-size: 0.85rem; color: var(--gov-text-muted);">
+                    <span><i class="fa-regular fa-clock"></i> Thời gian giải quyết: <strong><%= s.time_limit %></strong></span>
+                    <span><i class="fa-solid fa-coins"></i> Lệ phí: <strong><%= s.fee %></strong></span>
+                  </div>
+                </div>
+                <div>
+                  <a href="/dich-vu-cong/<%= s.id %>" class="btn-gov btn-gov-primary btn-gov-sm">
+                    Xem Hướng Dẫn & Nộp HS <i class="fa-solid fa-chevron-right"></i>
+                  </a>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } %>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>

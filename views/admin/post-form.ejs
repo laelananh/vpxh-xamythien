@@ -1,0 +1,98 @@
+<%- include('../partials/header') %>
+
+<main class="main-wrapper">
+  <div class="container">
+    
+    <div class="admin-wrapper">
+      
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <ul class="admin-menu">
+          <li><a href="/admin"><i class="fa-solid fa-gauge"></i> Tổng quan Báo cáo</a></li>
+          <li class="active"><a href="/admin/posts"><i class="fa-solid fa-newspaper"></i> Quản lý Bài viết & Tin</a></li>
+          <li><a href="/admin/tenders"><i class="fa-solid fa-file-contract"></i> Quản lý Gói Thầu</a></li>
+          <li><a href="/admin/services"><i class="fa-solid fa-hands-holding-child"></i> Quản lý Dịch vụ công</a></li>
+          <li><a href="/admin/contacts"><i class="fa-solid fa-comments"></i> Ý kiến Phản ánh</a></li>
+          <li style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);"><a href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Cổng Công Khai</a></li>
+          <li><a href="/admin/logout" style="color: #ff9999;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+        </ul>
+      </aside>
+
+      <!-- Admin Content -->
+      <section class="admin-content">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--gov-navy);">
+            <%= post ? 'CHỈNH SỬA BÀI VIẾT' : 'SOẠN BÀI VIẾT / THÔNG BÁO MỚI' %>
+          </h2>
+          <a href="/admin/posts" class="btn-gov" style="background: #e0e0e0; color: #333;">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
+          </a>
+        </div>
+
+        <div style="background: white; border: 1px solid var(--gov-border); border-radius: 6px; padding: 25px; box-shadow: var(--gov-shadow);">
+          
+          <form action="<%= post ? '/admin/posts/edit/' + post.id : '/admin/posts/create' %>" method="POST">
+            
+            <div class="form-group">
+              <label>Tiêu đề bài viết / thông báo <span style="color: var(--gov-red);">*</span></label>
+              <input type="text" name="title" value="<%= post ? post.title : '' %>" class="form-control" placeholder="Nhập tiêu đề rõ ràng..." required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+              <div class="form-group">
+                <label>Loại nội dung</label>
+                <select name="type" class="form-control">
+                  <option value="news" <%= post && post.type === 'news' ? 'selected' : '' %>>Tin tức - Sự kiện</option>
+                  <option value="announcement" <%= post && post.type === 'announcement' ? 'selected' : '' %>>Thông báo chỉ đạo</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Chuyên mục</label>
+                <select name="category_id" class="form-control">
+                  <% categories.forEach(cat => { %>
+                    <option value="<%= cat.id %>" <%= post && post.category_id === cat.id ? 'selected' : '' %>>
+                      <%= cat.name %>
+                    </option>
+                  <% }); %>
+                </select>
+              </div>
+
+              <div class="form-group" style="display: flex; align-items: center; margin-top: 20px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" name="is_featured" value="true" <%= post && post.is_featured ? 'checked' : '' %> style="width: 18px; height: 18px;">
+                  <strong>Đánh dấu bài viết nổi bật (Hiện Banner Trang Chủ)</strong>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Đường dẫn hình ảnh đại diện (Image URL)</label>
+              <input type="text" name="image_url" value="<%= post ? post.image_url : '' %>" class="form-control" placeholder="https://images.unsplash.com/...">
+            </div>
+
+            <div class="form-group">
+              <label>Tóm tắt bài viết (Mô tả ngắn hiển thị ở danh sách)</label>
+              <textarea name="summary" class="form-control" rows="3" placeholder="Viết 2-3 câu tóm tắt nội dung..."><%= post ? post.summary : '' %></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Nội dung chi tiết bài viết (Chấp nhận mã định dạng HTML hoặc văn bản thường) <span style="color: var(--gov-red);">*</span></label>
+              <textarea name="content" class="form-control" rows="12" placeholder="Nhập nội dung chi tiết bài viết tại đây. Sử dụng các thẻ <p>, <ul>, <li>, <strong> để định dạng bài đăng..." required><%= post ? post.content : '' %></textarea>
+            </div>
+
+            <button type="submit" class="btn-gov btn-gov-red" style="font-size: 1rem; padding: 12px 30px;">
+              <i class="fa-solid fa-floppy-disk"></i> <%= post ? 'Lưu Thay Đổi' : 'Đăng Bài Viết Ngay' %>
+            </button>
+          </form>
+
+        </div>
+
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
