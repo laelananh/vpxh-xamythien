@@ -297,13 +297,11 @@ module.exports = {
   },
   getPostById: (id) => dbData.posts.find(p => p.id === parseInt(id)),
   getPostBySlug: (slug) => dbData.posts.find(p => p.slug === slug),
-  createPost: (postData) => {
-    const newId = dbData.posts.length > 0 ? Math.max(...dbData.posts.map(p => p.id)) + 1 : 1;
+  createPost: async (postData) => {
     const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
-    const newPost = {
-      id: newId,
+    const insertPayload = {
       title: postData.title,
-      slug: postData.slug || postData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      slug: postData.slug || postData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       category_id: postData.category_id || 'an-sinh',
       type: postData.type || 'news',
       summary: postData.summary || '',
@@ -316,52 +314,84 @@ module.exports = {
       created_at: now,
       updated_at: now
     };
-    dbData.posts.unshift(newPost);
+
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.from('posts').insert([insertPayload]).select();
+        if (error) {
+          console.error('❌ Supabase Insert Error:', error.message);
+          const maxId = dbData.posts.length > 0 ? Math.max(...dbData.posts.map(p => p.id)) + 1 : 1;
+          insertPayload.id = maxId;
+          const { data: data2, error: error2 } = await supabase.from('posts').upsert([insertPayload]).select();
+          if (error2) console.error('❌ Supabase Upsert Error:', error2.message);
+          else if (data2 && data2[0]) insertPayload.id = data2[0].id;
+        } else if (data && data[0]) {
+          insertPayload.id = data[0].id;
+          console.log('✅ Supabase Insert Successful with ID:', insertPayload.id);
+        }
+      } catch (err) {
+        console.error('Supabase exception on createPost:', err.message);
+      }
+    }
+
+    if (!insertPayload.id) {
+      insertPayload.id = dbData.posts.length > 0 ? Math.max(...dbData.posts.map(p => p.id)) + 1 : 1;
+    }
+
+    dbData.posts.unshift(insertPayload);
+    saveLocal();
+    return insertPayload;
+  },
+  updatePost: async (id, postData) => {
+    const numericId = parseInt(id);
+    const idx = dbData.posts.findIndex(p => p.id === numericId);
+    const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    
+    const updatedItem = {
+      ...(idx !== -1 ? dbData.posts[idx] : {}),
+      ...postData,
+      id: numericId,
+      is_featured: postData.is_featured === true || postData.is_featured === 'true' || postData.is_featured === 'on',
+      updated_at: now
+    };
+
+    if (idx !== -1) {
+      dbData.posts[idx] = updatedItem;
+    } else {
+      dbData.posts.unshift(updatedItem);
+    }
     saveLocal();
 
-    // Async push to Supabase if connected
     if (supabase) {
-      supabase.from('posts').insert([newPost]).then(({ error }) => {
-        if (error) console.error('Error inserting post to Supabase:', error.message);
-      });
-    }
-
-    return newPost;
-  },
-  updatePost: (id, postData) => {
-    const idx = dbData.posts.findIndex(p => p.id === parseInt(id));
-    if (idx !== -1) {
-      const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
-      dbData.posts[idx] = {
-        ...dbData.posts[idx],
-        ...postData,
-        id: parseInt(id),
-        is_featured: postData.is_featured === true || postData.is_featured === 'true' || postData.is_featured === 'on',
-        updated_at: now
-      };
-      saveLocal();
-
-      if (supabase) {
-        supabase.from('posts').update(dbData.posts[idx]).eq('id', parseInt(id)).then();
+      try {
+        const { error } = await supabase.from('posts').upsert([updatedItem]);
+        if (error) console.error('❌ Supabase Update Error:', error.message);
+        else console.log('✅ Supabase Update Successful!');
+      } catch (e) {
+        console.error('Supabase update exception:', e.message);
       }
-
-      return dbData.posts[idx];
     }
-    return null;
+
+    return updatedItem;
   },
-  deletePost: (id) => {
-    const idx = dbData.posts.findIndex(p => p.id === parseInt(id));
+  deletePost: async (id) => {
+    const numericId = parseInt(id);
+    const idx = dbData.posts.findIndex(p => p.id === numericId);
     if (idx !== -1) {
       dbData.posts.splice(idx, 1);
       saveLocal();
-
-      if (supabase) {
-        supabase.from('posts').delete().eq('id', parseInt(id)).then();
-      }
-
-      return true;
     }
-    return false;
+
+    if (supabase) {
+      try {
+        const { error } = await supabase.from('posts').delete().eq('id', numericId);
+        if (error) console.error('❌ Supabase Delete Error:', error.message);
+      } catch (e) {
+        console.error('Supabase delete exception:', e.message);
+      }
+    }
+
+    return true;
   },
   incrementPostViews: (id) => {
     const post = dbData.posts.find(p => p.id === parseInt(id));

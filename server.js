@@ -305,7 +305,7 @@ app.get('/admin/posts/create', requireAuth, (req, res) => {
 });
 
 // Post Management - Create Action
-app.post('/admin/posts/create', requireAuth, postUpload, (req, res) => {
+app.post('/admin/posts/create', requireAuth, postUpload, async (req, res) => {
   const { title, category_id, type, summary, content, is_featured } = req.body;
   let image_url = req.body.image_url;
   let pdf_url = req.body.pdf_url;
@@ -327,7 +327,7 @@ app.post('/admin/posts/create', requireAuth, postUpload, (req, res) => {
   }
 
   if (title && content) {
-    const newPost = db.createPost({ title, category_id, type, summary, content, image_url, pdf_url, pdf_name, is_featured });
+    await db.createPost({ title, category_id, type, summary, content, image_url, pdf_url, pdf_name, is_featured });
     return res.redirect(`/admin/posts?msg=created`);
   }
   res.redirect('/admin/posts/create?error=missing');
@@ -345,7 +345,7 @@ app.get('/admin/posts/edit/:id', requireAuth, (req, res) => {
 });
 
 // Post Management - Edit Action
-app.post('/admin/posts/edit/:id', requireAuth, postUpload, (req, res) => {
+app.post('/admin/posts/edit/:id', requireAuth, postUpload, async (req, res) => {
   const { title, category_id, type, summary, content, is_featured } = req.body;
   let image_url = req.body.image_url;
   let pdf_url = req.body.pdf_url;
@@ -366,13 +366,13 @@ app.post('/admin/posts/edit/:id', requireAuth, postUpload, (req, res) => {
     }
   }
 
-  db.updatePost(req.params.id, { title, category_id, type, summary, content, image_url, pdf_url, pdf_name, is_featured });
+  await db.updatePost(req.params.id, { title, category_id, type, summary, content, image_url, pdf_url, pdf_name, is_featured });
   res.redirect('/admin/posts?msg=updated');
 });
 
 // Post Management - Delete Action
-app.post('/admin/posts/delete/:id', requireAuth, (req, res) => {
-  db.deletePost(req.params.id);
+app.post('/admin/posts/delete/:id', requireAuth, async (req, res) => {
+  await db.deletePost(req.params.id);
   res.redirect('/admin/posts?msg=deleted');
 });
 
