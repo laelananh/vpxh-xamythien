@@ -405,40 +405,40 @@ module.exports = {
     return list.sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
   },
   getTenderById: (id) => dbData.tenders.find(t => t.id === parseInt(id)),
-  createTender: (data) => {
-    const newId = dbData.tenders.length > 0 ? Math.max(...dbData.tenders.map(t => t.id)) + 1 : 1;
+  createTender: async (data) => {
     const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
-    const newTender = {
-      id: newId,
-      code: data.code || `GT-MT-2026-0${newId}`,
+    const insertPayload = {
+      code: data.code || `GT-2026-${Math.floor(Math.random()*1000)}`,
       title: data.title,
       budget: data.budget || 'Thỏa thuận',
-      investor: data.investor || 'UBND Xã Mỹ Thiện',
+      investor: data.investor || 'UBND Xã',
       status: data.status || 'Đang mời thầu',
       field: data.field || 'Mua sắm công',
       deadline: data.deadline || now,
       published_at: now,
       content: data.content || ''
     };
-    dbData.tenders.unshift(newTender);
-    saveLocal();
-
     if (supabase) {
-      supabase.from('tenders').insert([newTender]).then();
+      try {
+        const { data: inserted, error } = await supabase.from('tenders').insert([insertPayload]).select();
+        if (error) console.error("Tender insert error:", error);
+        else if (inserted && inserted.length > 0) {
+          dbData.tenders.unshift(inserted[0]);
+          saveLocal();
+          return inserted[0];
+        }
+      } catch(err){}
     }
-
-    return newTender;
+    return null;
   },
-  deleteTender: (id) => {
+  deleteTender: async (id) => {
+    if (supabase) {
+      await supabase.from('tenders').delete().eq('id', parseInt(id));
+    }
     const idx = dbData.tenders.findIndex(t => t.id === parseInt(id));
     if (idx !== -1) {
       dbData.tenders.splice(idx, 1);
       saveLocal();
-
-      if (supabase) {
-        supabase.from('tenders').delete().eq('id', parseInt(id)).then();
-      }
-
       return true;
     }
     return false;
@@ -455,39 +455,39 @@ module.exports = {
     return list;
   },
   getServiceById: (id) => dbData.services.find(s => s.id === parseInt(id)),
-  createService: (data) => {
-    const newId = dbData.services.length > 0 ? Math.max(...dbData.services.map(s => s.id)) + 1 : 1;
-    const newService = {
-      id: newId,
-      code: data.code || `TTHC-XH-0${newId}`,
+  createService: async (data) => {
+    const insertPayload = {
+      code: data.code || `TTHC-0${Math.floor(Math.random()*1000)}`,
       title: data.title,
       category: data.category || 'Chính sách Xã hội',
-      level: data.level || 'Dịch vụ công Trực tuyến Toàn trình',
-      time_limit: data.time_limit || '05 ngày làm việc',
+      level: data.level || 'Dịch vụ công Trực tuyến',
+      time_limit: data.time_limit || '05 ngày',
       fee: data.fee || 'Miễn phí',
-      authority: data.authority || 'Ủy ban nhân dân Xã Mỹ Thiện',
+      authority: data.authority || 'UBND Xã',
       steps: Array.isArray(data.steps) ? data.steps : (data.steps ? data.steps.split('\n') : []),
       dossier: Array.isArray(data.dossier) ? data.dossier : (data.dossier ? data.dossier.split('\n') : [])
     };
-    dbData.services.push(newService);
-    saveLocal();
-
     if (supabase) {
-      supabase.from('services').insert([newService]).then();
+      try {
+        const { data: inserted, error } = await supabase.from('services').insert([insertPayload]).select();
+        if (error) console.error("Service insert error:", error);
+        else if (inserted && inserted.length > 0) {
+          dbData.services.push(inserted[0]);
+          saveLocal();
+          return inserted[0];
+        }
+      } catch(err){}
     }
-
-    return newService;
+    return null;
   },
-  deleteService: (id) => {
+  deleteService: async (id) => {
+    if (supabase) {
+      await supabase.from('services').delete().eq('id', parseInt(id));
+    }
     const idx = dbData.services.findIndex(s => s.id === parseInt(id));
     if (idx !== -1) {
       dbData.services.splice(idx, 1);
       saveLocal();
-
-      if (supabase) {
-        supabase.from('services').delete().eq('id', parseInt(id)).then();
-      }
-
       return true;
     }
     return false;

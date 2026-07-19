@@ -400,16 +400,16 @@ app.get('/admin/tenders', requireAuth, (req, res) => {
   });
 });
 
-app.post('/admin/tenders/create', requireAuth, (req, res) => {
+app.post('/admin/tenders/create', requireAuth, async (req, res) => {
   const { code, title, budget, investor, status, field, deadline, content } = req.body;
   if (title) {
-    db.createTender({ code, title, budget, investor, status, field, deadline, content });
+    await db.createTender({ code, title, budget, investor, status, field, deadline, content });
   }
   res.redirect('/admin/tenders?msg=saved');
 });
 
-app.post('/admin/tenders/delete/:id', requireAuth, (req, res) => {
-  db.deleteTender(req.params.id);
+app.post('/admin/tenders/delete/:id', requireAuth, async (req, res) => {
+  await db.deleteTender(req.params.id);
   res.redirect('/admin/tenders?msg=deleted');
 });
 
@@ -422,16 +422,16 @@ app.get('/admin/services', requireAuth, (req, res) => {
   });
 });
 
-app.post('/admin/services/create', requireAuth, (req, res) => {
+app.post('/admin/services/create', requireAuth, async (req, res) => {
   const { code, title, category, level, time_limit, fee, authority, steps, dossier } = req.body;
   if (title) {
-    db.createService({ code, title, category, level, time_limit, fee, authority, steps, dossier });
+    await db.createService({ code, title, category, level, time_limit, fee, authority, steps, dossier });
   }
   res.redirect('/admin/services?msg=saved');
 });
 
-app.post('/admin/services/delete/:id', requireAuth, (req, res) => {
-  db.deleteService(req.params.id);
+app.post('/admin/services/delete/:id', requireAuth, async (req, res) => {
+  await db.deleteService(req.params.id);
   res.redirect('/admin/services?msg=deleted');
 });
 
