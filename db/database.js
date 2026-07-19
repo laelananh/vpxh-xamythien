@@ -210,11 +210,11 @@ let dbData = {
   }
 };
 
-// Auto Seed Supabase if connected
-async function autoSeedSupabase() {
+// Auto Sync & Seed Supabase if connected
+async function syncWithSupabase() {
   if (!supabase) return;
   try {
-    const { data: posts, error } = await supabase.from('posts').select('id').limit(1);
+    const { data: posts, error } = await supabase.from('posts').select('*').order('id', { ascending: false });
     if (error && error.code === 'PGRST116') {
       console.log('Tables not created in Supabase yet.');
       return;
@@ -227,13 +227,28 @@ async function autoSeedSupabase() {
       await supabase.from('services').upsert(sampleServices);
       await supabase.from('contacts').upsert(sampleContacts);
       console.log('✅ Supabase Seed Completed Successfully!');
+    } else {
+      console.log(`⚡ Syncing ${posts.length} posts from Supabase...`);
+      dbData.posts = posts;
+      
+      const { data: tenders } = await supabase.from('tenders').select('*').order('id', { ascending: false });
+      if (tenders && tenders.length > 0) dbData.tenders = tenders;
+
+      const { data: services } = await supabase.from('services').select('*');
+      if (services && services.length > 0) dbData.services = services;
+
+      const { data: contacts } = await supabase.from('contacts').select('*').order('id', { ascending: false });
+      if (contacts && contacts.length > 0) dbData.contacts = contacts;
+
+      saveLocal();
+      console.log('✅ Successfully loaded latest database from Supabase!');
     }
   } catch (err) {
-    console.error('Supabase auto seed error:', err.message);
+    console.error('Supabase sync error:', err.message);
   }
 }
 
-autoSeedSupabase();
+syncWithSupabase();
 
 function saveLocal() {
   try {

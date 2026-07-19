@@ -312,13 +312,17 @@ app.post('/admin/posts/create', requireAuth, postUpload, (req, res) => {
   let pdf_name = req.body.pdf_name || '';
 
   if (req.files && req.files['image_file'] && req.files['image_file'][0]) {
-    image_url = '/uploads/' + req.files['image_file'][0].filename;
+    const imgFile = req.files['image_file'][0];
+    const imgData = fs.readFileSync(imgFile.path);
+    image_url = `data:${imgFile.mimetype};base64,${imgData.toString('base64')}`;
   }
 
   if (req.files && req.files['pdf_file'] && req.files['pdf_file'][0]) {
-    pdf_url = '/uploads/' + req.files['pdf_file'][0].filename;
+    const pFile = req.files['pdf_file'][0];
+    const pData = fs.readFileSync(pFile.path);
+    pdf_url = `data:${pFile.mimetype};base64,${pData.toString('base64')}`;
     if (!pdf_name) {
-      pdf_name = req.files['pdf_file'][0].originalname;
+      pdf_name = pFile.originalname;
     }
   }
 
@@ -348,13 +352,17 @@ app.post('/admin/posts/edit/:id', requireAuth, postUpload, (req, res) => {
   let pdf_name = req.body.pdf_name || '';
 
   if (req.files && req.files['image_file'] && req.files['image_file'][0]) {
-    image_url = '/uploads/' + req.files['image_file'][0].filename;
+    const imgFile = req.files['image_file'][0];
+    const imgData = fs.readFileSync(imgFile.path);
+    image_url = `data:${imgFile.mimetype};base64,${imgData.toString('base64')}`;
   }
 
   if (req.files && req.files['pdf_file'] && req.files['pdf_file'][0]) {
-    pdf_url = '/uploads/' + req.files['pdf_file'][0].filename;
+    const pFile = req.files['pdf_file'][0];
+    const pData = fs.readFileSync(pFile.path);
+    pdf_url = `data:${pFile.mimetype};base64,${pData.toString('base64')}`;
     if (!pdf_name) {
-      pdf_name = req.files['pdf_file'][0].originalname;
+      pdf_name = pFile.originalname;
     }
   }
 
