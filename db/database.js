@@ -210,39 +210,29 @@ let dbData = {
   }
 };
 
-// Auto Sync & Seed Supabase if connected
+// Auto Sync Supabase if connected
 async function syncWithSupabase() {
   if (!supabase) return;
   try {
     const { data: posts, error } = await supabase.from('posts').select('*').order('id', { ascending: false });
-    if (error && error.code === 'PGRST116') {
-      console.log('Tables not created in Supabase yet.');
-      return;
-    }
-    if (!posts || posts.length === 0) {
-      console.log('🌱 Seeding sample data to Supabase...');
-      await supabase.from('categories').upsert(sampleCategories);
-      await supabase.from('posts').upsert(samplePosts);
-      await supabase.from('tenders').upsert(sampleTenders);
-      await supabase.from('services').upsert(sampleServices);
-      await supabase.from('contacts').upsert(sampleContacts);
-      console.log('✅ Supabase Seed Completed Successfully!');
-    } else {
+    if (error) {
+      console.error('Supabase fetch posts error:', error.message);
+    } else if (posts) {
       console.log(`⚡ Syncing ${posts.length} posts from Supabase...`);
       dbData.posts = posts;
-      
-      const { data: tenders } = await supabase.from('tenders').select('*').order('id', { ascending: false });
-      if (tenders && tenders.length > 0) dbData.tenders = tenders;
-
-      const { data: services } = await supabase.from('services').select('*');
-      if (services && services.length > 0) dbData.services = services;
-
-      const { data: contacts } = await supabase.from('contacts').select('*').order('id', { ascending: false });
-      if (contacts && contacts.length > 0) dbData.contacts = contacts;
-
-      saveLocal();
-      console.log('✅ Successfully loaded latest database from Supabase!');
     }
+    
+    const { data: tenders, error: tenderErr } = await supabase.from('tenders').select('*').order('id', { ascending: false });
+    if (!tenderErr && tenders) dbData.tenders = tenders;
+
+    const { data: services, error: servErr } = await supabase.from('services').select('*');
+    if (!servErr && services) dbData.services = services;
+
+    const { data: contacts, error: contactErr } = await supabase.from('contacts').select('*').order('id', { ascending: false });
+    if (!contactErr && contacts) dbData.contacts = contacts;
+
+    saveLocal();
+    console.log('✅ Successfully loaded latest database from Supabase!');
   } catch (err) {
     console.error('Supabase sync error:', err.message);
   }
