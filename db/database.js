@@ -203,26 +203,29 @@ async function syncWithSupabase() {
   if (!supabase) return;
   try {
     const { data: posts, error } = await supabase.from('posts').select('*').order('id', { ascending: false });
-    if (error) {
-      console.error('Supabase fetch posts error:', error.message);
-    } else if (posts) {
-      console.log(`⚡ Syncing ${posts.length} posts from Supabase...`);
-      dbData.posts = posts;
-    }
+    if (posts) dbData.posts = posts;
+
+    const { data: tenders } = await supabase.from('tenders').select('*').order('id', { ascending: false });
+    if (tenders) dbData.tenders = tenders;
+
+    const { data: services } = await supabase.from('services').select('*');
+    if (services) dbData.services = services;
+
+    const { data: contacts } = await supabase.from('contacts').select('*').order('id', { ascending: false });
+    if (contacts) dbData.contacts = contacts;
     
-    const { data: tenders, error: tenderErr } = await supabase.from('tenders').select('*').order('id', { ascending: false });
-    if (!tenderErr && tenders) dbData.tenders = tenders;
+    // Fetch users
+    const { data: users } = await supabase.from('users').select('*');
+    if (users) dbData.users = users;
 
-    const { data: services, error: servErr } = await supabase.from('services').select('*');
-    if (!servErr && services) dbData.services = services;
-
-    const { data: contacts, error: contactErr } = await supabase.from('contacts').select('*').order('id', { ascending: false });
-    if (!contactErr && contacts) dbData.contacts = contacts;
+    // Fetch categories
+    const { data: categories } = await supabase.from('categories').select('*');
+    if (categories) dbData.categories = categories;
 
     saveLocal();
-    console.log('✅ Successfully loaded latest database from Supabase!');
+    console.log('Successfully loaded latest database from Supabase!');
   } catch (err) {
-    console.error('Supabase sync error:', err.message);
+    console.error('Error syncing with Supabase:', err);
   }
 }
 
