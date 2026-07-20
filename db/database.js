@@ -241,21 +241,21 @@ function initLocal() {
     try {
       const parsed = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
       dbData = { ...dbData, ...parsed };
-      
-      // Ensure arrays exist to prevent spread errors
-      dbData.posts = dbData.posts || [];
-      dbData.tenders = dbData.tenders || [];
-      dbData.services = dbData.services || [];
-      dbData.contacts = dbData.contacts || [];
-      dbData.users = dbData.users || [];
-      dbData.categories = dbData.categories || [];
-      dbData.settings = dbData.settings || {};
     } catch (e) {
-      saveLocal();
+      console.error('Error parsing DB_FILE, recreating...');
     }
-  } else {
-    saveLocal();
   }
+  
+  // Ensure arrays exist in all cases
+  dbData.posts = dbData.posts || [];
+  dbData.tenders = dbData.tenders || [];
+  dbData.services = dbData.services || [];
+  dbData.contacts = dbData.contacts || [];
+  dbData.users = dbData.users || [];
+  dbData.categories = dbData.categories || [];
+  dbData.settings = dbData.settings || {};
+
+  saveLocal();
 }
 
 initLocal();
