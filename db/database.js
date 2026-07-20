@@ -270,6 +270,36 @@ module.exports = {
   supabase: supabase,
   getData: () => dbData,
 
+  // Storage
+  uploadFileToStorage: async (fileBuffer, mimetype, originalname) => {
+    if (!supabase) return null;
+    try {
+      const ext = originalname.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+      
+      const { data, error } = await supabase.storage
+        .from('uploads')
+        .upload(fileName, fileBuffer, {
+          contentType: mimetype,
+          upsert: false
+        });
+
+      if (error) {
+        console.error('Supabase Storage Error:', error);
+        return null;
+      }
+      
+      const { data: publicUrlData } = supabase.storage
+        .from('uploads')
+        .getPublicUrl(fileName);
+        
+      return publicUrlData.publicUrl;
+    } catch (err) {
+      console.error('Upload catch error:', err);
+      return null;
+    }
+  },
+
   // Users
   getUserByUsername: (username) => dbData.users.find(u => u.username === username),
   getUserById: (id) => dbData.users.find(u => u.id === parseInt(id)),

@@ -314,13 +314,15 @@ app.post('/admin/posts/create', requireAuth, postUpload, async (req, res) => {
   if (req.files && req.files['image_file'] && req.files['image_file'][0]) {
     const imgFile = req.files['image_file'][0];
     const imgData = fs.readFileSync(imgFile.path);
-    image_url = `data:${imgFile.mimetype};base64,${imgData.toString('base64')}`;
+    const uploadedUrl = await db.uploadFileToStorage(imgData, imgFile.mimetype, imgFile.originalname);
+    image_url = uploadedUrl || `data:${imgFile.mimetype};base64,${imgData.toString('base64')}`;
   }
 
   if (req.files && req.files['pdf_file'] && req.files['pdf_file'][0]) {
     const pFile = req.files['pdf_file'][0];
     const pData = fs.readFileSync(pFile.path);
-    pdf_url = `data:${pFile.mimetype};base64,${pData.toString('base64')}`;
+    const uploadedUrl = await db.uploadFileToStorage(pData, pFile.mimetype, pFile.originalname);
+    pdf_url = uploadedUrl || `data:${pFile.mimetype};base64,${pData.toString('base64')}`;
     if (!pdf_name) {
       pdf_name = pFile.originalname;
     }
@@ -357,13 +359,15 @@ app.post('/admin/posts/edit/:id', requireAuth, postUpload, async (req, res) => {
   if (req.files && req.files['image_file'] && req.files['image_file'][0]) {
     const imgFile = req.files['image_file'][0];
     const imgData = fs.readFileSync(imgFile.path);
-    image_url = `data:${imgFile.mimetype};base64,${imgData.toString('base64')}`;
+    const uploadedUrl = await db.uploadFileToStorage(imgData, imgFile.mimetype, imgFile.originalname);
+    image_url = uploadedUrl || `data:${imgFile.mimetype};base64,${imgData.toString('base64')}`;
   }
 
   if (req.files && req.files['pdf_file'] && req.files['pdf_file'][0]) {
     const pFile = req.files['pdf_file'][0];
     const pData = fs.readFileSync(pFile.path);
-    pdf_url = `data:${pFile.mimetype};base64,${pData.toString('base64')}`;
+    const uploadedUrl = await db.uploadFileToStorage(pData, pFile.mimetype, pFile.originalname);
+    pdf_url = uploadedUrl || `data:${pFile.mimetype};base64,${pData.toString('base64')}`;
     if (!pdf_name) {
       pdf_name = pFile.originalname;
     }
