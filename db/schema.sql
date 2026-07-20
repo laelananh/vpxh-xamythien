@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS posts (
   summary TEXT,
   content TEXT,
   image_url TEXT,
+  pdf_url TEXT,
+  pdf_name TEXT,
   is_featured BOOLEAN DEFAULT FALSE,
   views INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

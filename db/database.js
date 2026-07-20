@@ -239,7 +239,17 @@ function saveLocal() {
 function initLocal() {
   if (fs.existsSync(DB_FILE)) {
     try {
-      dbData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      const parsed = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      dbData = { ...dbData, ...parsed };
+      
+      // Ensure arrays exist to prevent spread errors
+      dbData.posts = dbData.posts || [];
+      dbData.tenders = dbData.tenders || [];
+      dbData.services = dbData.services || [];
+      dbData.contacts = dbData.contacts || [];
+      dbData.users = dbData.users || [];
+      dbData.categories = dbData.categories || [];
+      dbData.settings = dbData.settings || {};
     } catch (e) {
       saveLocal();
     }
@@ -272,7 +282,7 @@ module.exports = {
     if (filter.is_featured !== undefined) list = list.filter(p => p.is_featured === filter.is_featured);
     if (filter.search) {
       const q = filter.search.toLowerCase();
-      list = list.filter(p => p.title.toLowerCase().includes(q) || p.summary.toLowerCase().includes(q));
+      list = list.filter(p => (p.title && p.title.toLowerCase().includes(q)) || (p.summary && p.summary.toLowerCase().includes(q)));
     }
     return list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   },
