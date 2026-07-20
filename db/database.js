@@ -314,17 +314,14 @@ module.exports = {
         const { data, error } = await supabase.from('posts').insert([insertPayload]).select();
         if (error) {
           console.error('❌ Supabase Insert Error:', error.message);
-          const maxId = dbData.posts.length > 0 ? Math.max(...dbData.posts.map(p => p.id)) + 1 : 1;
-          insertPayload.id = maxId;
-          const { data: data2, error: error2 } = await supabase.from('posts').upsert([insertPayload]).select();
-          if (error2) console.error('❌ Supabase Upsert Error:', error2.message);
-          else if (data2 && data2[0]) insertPayload.id = data2[0].id;
+          return { error: error.message, details: error.details, hint: error.hint };
         } else if (data && data[0]) {
           insertPayload.id = data[0].id;
           console.log('✅ Supabase Insert Successful with ID:', insertPayload.id);
         }
       } catch (err) {
         console.error('Supabase exception on createPost:', err.message);
+        return { error: err.message };
       }
     }
 

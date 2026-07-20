@@ -327,7 +327,10 @@ app.post('/admin/posts/create', requireAuth, postUpload, async (req, res) => {
   }
 
   if (title && content) {
-    await db.createPost({ title, category_id, type, summary, content, image_url, pdf_url, pdf_name, is_featured });
+    const result = await db.createPost({ title, category_id, type, summary, content, image_url, pdf_url, pdf_name, is_featured });
+    if (result && result.error) {
+      return res.send(`<h2>Lỗi lưu vào Supabase</h2><p><strong>Lỗi:</strong> ${result.error}</p><p>Chi tiết: ${result.details || ''}</p><p>Gợi ý: ${result.hint || ''}</p><p>Vui lòng chụp lại màn hình này và gửi cho AI.</p><br><a href="/admin/posts/create">Quay lại</a>`);
+    }
     return res.redirect(`/admin/posts?msg=created`);
   }
   res.redirect('/admin/posts/create?error=missing');
